@@ -119,8 +119,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { ok: false, error: "Password minimal 6 karakter." };
 
     const store = loadStore();
-    if (store.users.some((u) => u.email === email))
+    const existing = store.users.find((u) => u.email === email);
+    
+    if (existing) {
+      if (existing.password === c.password) {
+        // Already registered with correct password -> auto login
+        const session: AuthUser = {
+          id: `email-${Date.now()}`,
+          name: existing.name,
+          email: existing.email,
+          provider: "email",
+          createdAt: existing.createdAt,
+        };
+        store.session = session;
+        saveStore(store);
+        setUser(session);
+        return { ok: true };
+      }
       return { ok: false, error: "Email sudah terdaftar. Silakan login." };
+    }
 
     const created: AuthUser = {
       id: `email-${Date.now()}`,
