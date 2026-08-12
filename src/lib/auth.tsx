@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
   type ReactNode,
-} from "react";
+} from "react"; 
 
 const AUTH_KEY = "skillpath-auth";
 const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
