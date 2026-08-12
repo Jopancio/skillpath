@@ -1,0 +1,275 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* New Futuristic Orange-Gold Palette */
+  --color-primary: #FF6B2C;
+  --color-primary-hover: #D94A16;
+  --color-secondary: #F4B942;
+  --color-accent: #F4B942;
+  --color-accent-2: #FF6B2C;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-background: #FFF8F2;
+  --color-card: #FFFFFF;
+  --color-border: #FFE8D6;
+  --color-foreground: #111827;
+  --color-muted: #6B7280;
+  --color-gold: #F4B942;
+  --color-deep-orange: #D94A16;
+
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-poppins), var(--font-plus-jakarta), sans-serif;
+
+  --radius-xl: 1rem;
+  --shadow-soft: 0 8px 32px -8px rgb(255 107 44 / 0.25);
+  --shadow-card: 0 4px 20px -4px rgb(17 24 39 / 0.08);
+  --shadow-glow: 0 0 40px rgb(255 107 44 / 0.15);
+  --shadow-gold-glow: 0 0 30px rgb(244 185 66 / 0.2);
+}
+
+.dark {
+  /* Dark theme — warm dark palette */
+  --color-background: #0F1117;
+  --color-card: #1A1D26;
+  --color-border: #2A2E3A;
+  --color-foreground: #F3F4F6;
+  --color-muted: #9CA3AF;
+  --color-primary: #FF7A3D;
+  --color-deep-orange: #E05A20;
+  --color-gold: #F4B942;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 6.5rem;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+/* Subtle animated gradient background for futuristic feel */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 0%, rgb(255 107 44 / 0.08), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 100%, rgb(244 185 66 / 0.06), transparent);
+  pointer-events: none;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Duolingo-style chunky button with modern twist */
+.btn-3d {
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    background-color 0.15s ease,
+    filter 0.15s ease;
+  box-shadow: 0 4px 0 0 rgb(217 74 22 / 0.3);
+  position: relative;
+  overflow: hidden;
+}
+.btn-3d::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 30%, rgb(255 255 255 / 0.15) 50%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.btn-3d:hover:not(:disabled)::before {
+  opacity: 1;
+}
+.btn-3d:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+.btn-3d:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 0 rgb(217 74 22 / 0.3);
+}
+.btn-3d:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Futuristic gradient border effect */
+.gradient-border {
+  position: relative;
+  background: var(--color-card);
+  border-radius: 1rem;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(1rem + 2px);
+  background: linear-gradient(135deg, #FF6B2C, #F4B942, #D94A16);
+  z-index: -1;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+.gradient-border:hover::before {
+  opacity: 0.6;
+}
+
+/* Glass morphism effect */
+.glass {
+  background: rgb(255 255 255 / 0.7);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgb(255 255 255 / 0.3);
+}
+
+.dark .glass {
+  background: rgb(26 29 38 / 0.7);
+  border: 1px solid rgb(255 255 255 / 0.08);
+}
+
+/* Neon glow text effect */
+.text-glow {
+  text-shadow: 0 0 20px rgb(255 107 44 / 0.5);
+}
+
+.text-gold-glow {
+  text-shadow: 0 0 20px rgb(244 185 66 / 0.5);
+}
+
+/* Path node connector line */
+.path-line {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-border) 55%,
+    transparent 45%
+  );
+  background-size: 4px 14px;
+  background-repeat: repeat-y;
+}
+
+/* Certificate print */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #certificate-print,
+  #certificate-print * {
+    visibility: visible;
+  }
+  #certificate-print {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* Custom scrollbar with orange accent */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF6B2C, #F4B942);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #D94A16, #F4B942);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Infinite marquee (slide to the right, seamless loop) */
+@keyframes marquee {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 107 44 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgb(255 107 44 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(255 107 44 / 0);
+  }
+}
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer loading effect */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    var(--color-background) 4%,
+    rgb(255 107 44 / 0.1) 25%,
+    var(--color-background) 36%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Gradient text effect */
+.gradient-text {
+  background: linear-gradient(135deg, #FF6B2C 0%, #F4B942 50%, #D94A16 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Futuristic card hover effect */
+.card-futuristic {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-futuristic:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 12px 40px -8px rgb(255 107 44 / 0.2),
+    0 0 0 1px rgb(255 107 44 / 0.1);
+}
