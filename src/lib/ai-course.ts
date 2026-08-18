@@ -296,21 +296,26 @@ export function sanitizeCourse(
   const id = `ai-${slugify(raw.title || skill)}-${Date.now().toString(36)}`;
   const color = COLORS[Math.floor(Math.random() * COLORS.length)];
 
-  const modules = raw.modules.slice(0, 4).map((m, mi) => ({
-    id: `${id}-m${mi + 1}`,
-    title: loc(m.title || `Modul ${mi + 1}`),
-    lessons: (Array.isArray(m.lessons) ? m.lessons : []).slice(0, 5).map((l, li) => ({
-      id: `${id}-m${mi + 1}l${li + 1}`,
-      title: loc(l.title || `Pelajaran ${li + 1}`),
-      type: "text" as const,
-      duration: clampInt(l.duration, 3, 15, 5),
-      xp: 50,
-      body: loc(String(l.body ?? "").slice(0, MAX_BODY_CHARS)),
-    })),
-  }));
+  const modules = raw.modules
+    .slice(0, 4)
+    .map((m, mi) => ({
+      id: `${id}-m${mi + 1}`,
+      title: loc(m.title || `Modul ${mi + 1}`),
+      lessons: (Array.isArray(m.lessons) ? m.lessons : []).slice(0, 5).map((l, li) => ({
+        id: `${id}-m${mi + 1}l${li + 1}`,
+        title: loc(l.title || `Pelajaran ${li + 1}`),
+        type: "text" as const,
+        duration: clampInt(l.duration, 3, 15, 5),
+        xp: 50,
+        body: loc(String(l.body ?? "").slice(0, MAX_BODY_CHARS)),
+      })),
+    }))
+    // Tolerate AI modules that came back without lessons: drop them
+    // instead of failing the whole generation.
+    .filter((m) => m.lessons.length > 0);
 
-  if (modules.some((m) => m.lessons.length === 0)) {
-    throw new Error("AI response contains a module without lessons");
+  if (modules.length === 0) {
+    throw new Error("AI response contains no modules with lessons");
   }
 
   const quiz = raw.quiz.slice(0, 10).map((q, qi) => {
