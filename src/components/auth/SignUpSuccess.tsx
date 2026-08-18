@@ -88,8 +88,24 @@ export function SignUpSuccess({
   const onExitComplete = () => {
     if (hasExitedRef.current) return;
     hasExitedRef.current = true;
-    if (onContinue) onContinue();
-    else router.replace(href);
+    const go = () => {
+      if (onContinue) onContinue();
+      else router.replace(href);
+    };
+    // Crossfade into the onboarding wizard instead of a hard page swap.
+    const doc = document as Document & {
+      startViewTransition?: (fn: () => void) => unknown;
+    };
+    let transitioned = false;
+    try {
+      if (typeof doc.startViewTransition === "function") {
+        doc.startViewTransition(go);
+        transitioned = true;
+      }
+    } catch {
+      // Fall through — never let the transition swallow the navigation.
+    }
+    if (!transitioned) go();
   };
 
   const triggerExit = () => setPhase("exiting");

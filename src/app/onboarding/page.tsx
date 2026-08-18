@@ -30,6 +30,8 @@ import { Button } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/icon-map";
 import { AIThinkingLoader } from "@/components/ui/AIThinkingLoader";
 import { AICourseDialog } from "@/components/ui/AICourseDialog";
+import { SignUpSuccess } from "@/components/auth/SignUpSuccess";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 const TOTAL_STEPS = 12;
@@ -54,10 +56,14 @@ interface PlacementState {
 export default function OnboardingPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
+  const { user } = useAuth();
   const { hydrated, onboarded, userName, completeOnboarding, setPlacement } =
     useProgress();
   const { allCourses, addCourse, getCourseById } = useCustomCourses();
 
+  // Welcome animation plays on every fresh visit (i.e. right after signup);
+  // once the wizard is done, repeat visits are redirected away below.
+  const [celebrating, setCelebrating] = useState(true);
   const [step, setStep] = useState(0);
   // Lazily prefill the name from a previous session (localStorage)
   const [name, setName] = useState(userName);
@@ -97,7 +103,7 @@ export default function OnboardingPage() {
   // them away while the AI coach phase is running (it persists onboarding).
   useEffect(() => {
     if (hydrated && onboarded && phase === "steps") {
-      router.replace("/courses");
+      router.replace("/");
     }
   }, [hydrated, onboarded, router, phase]);
 
@@ -353,7 +359,12 @@ export default function OnboardingPage() {
   /* ===================== AI coach phases render ===================== */
   if (phase !== "steps") {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-10 md:py-14">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-10 md:py-14"
+      >
         <AnimatePresence mode="wait">
           {/* ---- Learning style: analyzing (loading) ---- */}
           {phase === "style" && (
@@ -839,12 +850,17 @@ export default function OnboardingPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 md:py-12">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 md:py-12"
+    >
       {/* ===== Top bar: progress + skip ===== */}
       <div className="flex items-center gap-4">
         <div className="flex-1">
@@ -863,13 +879,6 @@ export default function OnboardingPage() {
             />
           </div>
         </div>
-        <button
-          type="button"
-          onClick={() => router.push("/courses")}
-          className="shrink-0 rounded-full px-3 py-1.5 text-xs font-bold text-muted transition-colors hover:bg-card hover:text-foreground"
-        >
-          {ob.skip}
-        </button>
       </div>
 
       {/* ===== Steps ===== */}
@@ -1279,6 +1288,14 @@ export default function OnboardingPage() {
           ambition,
         }}
       />
-    </div>
+
+      {/* Welcome animation shown before the wizard (post-signup) */}
+      {celebrating && (
+        <SignUpSuccess
+          name={user?.name}
+          onContinue={() => setCelebrating(false)}
+        />
+      )}
+    </motion.div>
   );
 }

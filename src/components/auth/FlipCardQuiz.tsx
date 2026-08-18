@@ -253,16 +253,16 @@ export function FlipCardQuiz({ autoPlay = true }: { autoPlay?: boolean }) {
 
       {/* ===== Game card ===== */}
       <div
-        className="relative h-[30rem] w-full max-w-lg"
+        className="relative h-[30rem] w-full max-w-lg overflow-hidden"
         style={{ perspective: "1800px" }}
       >
         <AnimatePresence mode="wait">
           <motion.div
             key={game.id + phase}
-            initial={{ opacity: 0, scale: 0.94, rotateY: -15 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            exit={{ opacity: 0, scale: 0.96, rotateY: 15 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className="h-full"
           >
             {phase === "intro" && <GameIntro game={game} />}

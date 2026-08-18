@@ -273,3 +273,23 @@ body::before {
     0 12px 40px -8px rgb(255 107 44 / 0.2),
     0 0 0 1px rgb(255 107 44 / 0.1);
 }
+
+/* Cross-page transition (signup success -> onboarding wizard) */
+::view-transition-old(root) {
+  animation: sp-vt-out 0.3s ease-out both;
+}
+::view-transition-new(root) {
+  animation: sp-vt-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes sp-vt-out {
+  to {
+    opacity: 0;
+    transform: scale(1.03);
+  }
+}
+@keyframes sp-vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.985);
+  }
+}

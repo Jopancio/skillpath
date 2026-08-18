@@ -47,9 +47,9 @@ export function Navbar() {
         { href: "/dashboard", label: t.nav.dashboard, icon: LayoutDashboard, anchor: false },
       ];
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setMenuOpen(false);
-    signOut();
+    await signOut();
     router.replace("/login");
   };
 

@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import "./globals.css";
@@ -38,11 +39,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers>
+        <ClerkProvider>
+          <Providers>
           <Navbar />
           <main className="flex-1 pt-24">{children}</main>
           <Footer />
-        </Providers>
+          </Providers>
+        </ClerkProvider>
       </body>
     </html>
   );
