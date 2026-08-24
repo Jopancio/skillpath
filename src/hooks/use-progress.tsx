@@ -16,6 +16,7 @@ import {
   fetchUserData,
   persistUserData,
   supabase,
+  upsertLeaderboardEntry,
 } from "@/lib/supabase";
 
 const BASE_STORAGE_KEY = "skillpath-progress-v1";
@@ -140,7 +141,7 @@ function ProgressInner({
   const [state, setState] = useState<PersistedState>(initialState);
   const [hydrated, setHydrated] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { getToken } = useAuth();
+  const { user, getToken } = useAuth();
 
   const migrateState = useCallback((raw: PersistedState): PersistedState => {
     // Migrate states persisted before onboarding fields existed
@@ -198,12 +199,23 @@ function ProgressInner({
       window.localStorage.setItem(storageKey, JSON.stringify(state));
       if (userId && supabase) {
         void persistUserData("progress", userId, state, getToken);
+        // Publish the stats that power the dashboard leaderboard.
+        void upsertLeaderboardEntry(
+          userId,
+          {
+            displayName: state.userName || user?.name || "Anonim",
+            xp: state.xp,
+            streak: state.streak,
+            lessonsDone: state.completedLessons.length,
+          },
+          getToken
+        );
       }
     }, 150);
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [state, hydrated, storageKey, userId, getToken]);
+  }, [state, hydrated, storageKey, userId, user, getToken]);
 
   const touchStreak = useCallback((s: PersistedState): PersistedState => {
     const today = todayKey();

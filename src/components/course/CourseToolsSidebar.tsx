@@ -23,7 +23,9 @@ import {
 } from "lucide-react";
 import type { Course } from "@/data/types";
 import { useI18n, pick } from "@/lib/i18n";
+import { useProgress } from "@/hooks/use-progress";
 import { MarkdownText } from "@/components/ui/markdown";
+import { AIThinkingLoader } from "@/components/ui/AIThinkingLoader";
 import { cn } from "@/lib/utils";
 
 /* ------------------------------ storage ------------------------------ */
@@ -74,7 +76,15 @@ function coursePayload(course: Course, locale: "id" | "en") {
     description: pick(locale, course.longDescription),
     modules: course.modules.map((m) => ({
       title: pick(locale, m.title),
-      lessons: m.lessons.map((l) => pick(locale, l.title)),
+      lessons: m.lessons.map((l) => ({
+        title: pick(locale, l.title),
+        type: l.type,
+        body: l.body ? pick(locale, l.body) : undefined,
+        cards: l.cards?.map((c) => ({
+          front: pick(locale, c.front),
+          back: pick(locale, c.back),
+        })),
+      })),
     })),
   };
 }
@@ -194,7 +204,9 @@ export function CourseToolsSidebar({
               )}
               {active === "flashcards" && <FlashcardsTool course={course} />}
               {active === "quiz" && <QuizTool course={course} />}
-              {active === "ai" && <AiTool course={course} />}
+              {active === "ai" && (
+                <AiTool course={course} completedLessons={completedLessons} />
+              )}
               {active === "mindmap" && <MindmapTool course={course} />}
             </div>
           </div>
@@ -226,9 +238,8 @@ export function CourseToolsSidebar({
 
 function Generating({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl border border-dashed border-border bg-background p-10 text-center">
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-sm font-semibold text-muted">{label}</p>
+    <div className="flex flex-col items-center gap-3 rounded-2xl border border-border bg-background p-6 text-center">
+      <AIThinkingLoader title={label} height={160} />
     </div>
   );
 }
@@ -1167,8 +1178,16 @@ function QuizTool({ course }: { course: Course }) {
 
 /* --------------------------------- AI ---------------------------------- */
 
-function AiTool({ course }: { course: Course }) {
+function AiTool({
+  course,
+  completedLessons,
+}: {
+  course: Course;
+  completedLessons?: ReadonlySet<string>;
+}) {
   const { t, locale } = useI18n();
+  const { userName, xp, streak, level, quizResults, onboarding, placement } =
+    useProgress();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1177,6 +1196,46 @@ function AiTool({ course }: { course: Course }) {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight });
   }, [messages, loading]);
+
+  // Who is asking + where they are in this course, so the AI can personalize answers
+  const userContext = useMemo(() => {
+    const lessons = course.modules.flatMap((m) => m.lessons);
+    const done = lessons.filter((l) => completedLessons?.has(l.id));
+    const quiz = quizResults[course.id];
+    const nextLesson = lessons.find((l) => !completedLessons?.has(l.id));
+    return {
+      name: userName || undefined,
+      level,
+      xp,
+      streak,
+      dailyGoalMinutes: onboarding?.dailyGoalMinutes,
+      knowledgeLevel: onboarding?.knowledgeLevel,
+      learningExp: onboarding?.learningExp,
+      reason: onboarding?.reason,
+      graspMethod: onboarding?.graspMethod,
+      focusEnemy: onboarding?.focusEnemy,
+      placementLevel: placement?.level,
+      courseProgress: {
+        completedCount: done.length,
+        totalCount: lessons.length,
+        completedTitles: done.slice(0, 15).map((l) => pick(locale, l.title)),
+        nextTitle: nextLesson ? pick(locale, nextLesson.title) : undefined,
+        quizScore: quiz?.score,
+        quizPassed: quiz?.passed,
+      },
+    };
+  }, [
+    course,
+    completedLessons,
+    locale,
+    userName,
+    xp,
+    streak,
+    level,
+    quizResults,
+    onboarding,
+    placement,
+  ]);
 
   const send = async () => {
     const question = input.trim();
@@ -1191,6 +1250,7 @@ function AiTool({ course }: { course: Course }) {
         question,
         course: coursePayload(course, locale),
         history: messages.slice(-6),
+        userContext,
         locale,
       });
       const answer =

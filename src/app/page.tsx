@@ -5,9 +5,7 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Award,
-  Flame,
   Gamepad2,
-  GraduationCap,
   HelpCircle,
   Map,
   Quote,
@@ -15,7 +13,6 @@ import {
   Star,
   Users,
   Wrench,
-  Zap,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useProgress } from "@/hooks/use-progress";
@@ -26,9 +23,9 @@ import { CourseCard } from "@/components/course/CourseCard";
 import { ButtonLink } from "@/components/ui/button";
 import AccordionGallery from "@/components/ui/AccordionGallery";
 import { FaqAccordion } from "@/components/ui/FaqAccordion";
+import TextType from "@/components/ui/TextType";
 
 const featureIcons = [Gamepad2, Map, Wrench, Award];
-
 export default function HomePage() {
   const { t } = useI18n();
   const { onboarded, hydrated } = useProgress();
@@ -63,7 +60,7 @@ export default function HomePage() {
           aria-hidden
         />
 
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 md:grid-cols-2 md:py-24">
+        <div className="mx-auto max-w-3xl px-4 py-16 text-center md:py-24">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -75,12 +72,23 @@ export default function HomePage() {
             </span>
             <h1 className="mt-5 font-display text-4xl font-extrabold leading-tight tracking-tight md:text-5xl">
               {t.hero.titleA}{" "}
-              <span className="gradient-text">{t.hero.titleB}</span>
+              <TextType
+                text={t.hero.titleBRotating}
+                as="span"
+                className="gradient-text"
+                typingSpeed={70}
+                deletingSpeed={40}
+                pauseDuration={2200}
+                initialDelay={600}
+                variableSpeed={{ min: 45, max: 110 }}
+                cursorCharacter="|"
+                cursorClassName="gradient-text"
+              />
             </h1>
-            <p className="mt-4 max-w-md text-base leading-relaxed text-muted md:text-lg">
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
               {t.hero.subtitle}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
               <ButtonLink href={startHref} size="lg">
                 {t.hero.cta}
                 <ArrowRight className="h-5 w-5" />
@@ -90,7 +98,7 @@ export default function HomePage() {
               </ButtonLink>
             </div>
 
-            <div className="mt-10 flex gap-8">
+            <div className="mt-10 flex justify-center gap-8">
               {[
                 { value: "12K+", label: t.hero.stats.learners },
                 { value: `${allCourses.length}`, label: t.hero.stats.courses },
@@ -103,63 +111,6 @@ export default function HomePage() {
                   <div className="text-xs font-semibold text-muted">{s.label}</div>
                 </div>
               ))}
-            </div>
-          </motion.div>
-
-          {/* Hero visual: floating cards */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
-            className="relative hidden justify-center md:flex"
-          >
-            <div className="relative">
-              <div className="animate-float flex h-64 w-64 items-center justify-center rounded-[2.5rem] bg-gradient-to-br from-primary via-deep-orange to-gold shadow-glow">
-                <GraduationCap className="h-32 w-32 text-white" strokeWidth={1.2} />
-              </div>
-
-              <motion.div
-                className="glass absolute -left-16 top-4 flex items-center gap-2 rounded-2xl px-4 py-3 shadow-card"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-deep-orange text-white">
-                  <Flame className="h-5 w-5" />
-                </span>
-                <div>
-                  <div className="font-display text-sm font-extrabold">14</div>
-                  <div className="text-[10px] font-semibold text-muted">
-                    {t.dashboard.dayStreak}
-                  </div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="glass absolute -right-14 bottom-10 flex items-center gap-2 rounded-2xl px-4 py-3 shadow-card"
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 3.4, repeat: Infinity }}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-gold to-primary text-white">
-                  <Zap className="h-5 w-5" />
-                </span>
-                <div>
-                  <div className="font-display text-sm font-extrabold">1,240</div>
-                  <div className="text-[10px] font-semibold text-muted">XP</div>
-                </div>
-              </motion.div>
-
-              <motion.div
-                className="glass absolute -bottom-6 left-6 flex items-center gap-2 rounded-2xl px-4 py-3 shadow-card"
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 2.8, repeat: Infinity, delay: 1 }}
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-success to-success/70 text-white">
-                  <Award className="h-5 w-5" />
-                </span>
-                <div className="font-display text-xs font-bold">
-                  {t.certificate.title}
-                </div>
-              </motion.div>
             </div>
           </motion.div>
         </div>

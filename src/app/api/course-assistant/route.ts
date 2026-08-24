@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { extractJSON } from "@/lib/ai-course";
 
 const COSMOSHUB_URL = "https://api.cosmoshub.tech/v1/chat/completions";
@@ -26,6 +27,38 @@ function cleanString(v: unknown, max: number): string {
 
 /* ----------------------------- course shape ---------------------------- */
 
+interface CleanLesson {
+  title: string;
+  body: string;
+  cards: { front: string; back: string }[];
+}
+
+function cleanLesson(raw: unknown): CleanLesson {
+  // Legacy payloads sent plain lesson-title strings
+  if (typeof raw === "string" || typeof raw !== "object" || raw === null) {
+    return {
+      title: cleanString(raw, 160),
+      body: "",
+      cards: [],
+    };
+  }
+  const l = raw as Record<string, unknown>;
+  const cards = Array.isArray(l.cards)
+    ? (l.cards as Record<string, unknown>[])
+        .slice(0, 10)
+        .map((c) => ({
+          front: cleanString(c?.front, 200),
+          back: cleanString(c?.back, 500),
+        }))
+        .filter((c) => c.front && c.back)
+    : [];
+  return {
+    title: cleanString(l.title, 160),
+    body: cleanString(l.body, 2400),
+    cards,
+  };
+}
+
 function cleanCourse(raw: unknown) {
   const o = (raw ?? {}) as Record<string, unknown>;
   const title = cleanString(o.title, 120);
@@ -34,17 +67,181 @@ function cleanCourse(raw: unknown) {
     ? (o.modules as Record<string, unknown>[]).slice(0, 12).map((m) => ({
         title: cleanString(m?.title, 120),
         lessons: Array.isArray(m?.lessons)
-          ? (m.lessons as unknown[]).slice(0, 12).map((l) => cleanString(l, 160))
+          ? (m.lessons as unknown[]).slice(0, 12).map(cleanLesson)
           : [],
       }))
     : [];
   return { title, description, modules };
 }
 
-function courseOutline(course: ReturnType<typeof cleanCourse>): string {
+type CleanCourse = ReturnType<typeof cleanCourse>;
+
+function courseOutline(course: CleanCourse): string {
   return course.modules
-    .map((m) => `- ${m.title}: ${m.lessons.join(", ")}`)
+    .map((m) => `- ${m.title}: ${m.lessons.map((l) => l.title).join(", ")}`)
     .join("\n");
+}
+
+/** Full lesson material (bodies + flipcards) so the assistant can answer about the content itself. */
+function courseMaterial(course: CleanCourse): string {
+  return course.modules
+    .map(
+      (m) =>
+        `## ${m.title}\n` +
+        m.lessons
+          .map((l) => {
+            const parts = [`### ${l.title}`];
+            if (l.body) parts.push(l.body);
+            if (l.cards.length > 0) {
+              parts.push(
+                l.cards.map((c) => `- ${c.front}: ${c.back}`).join("\n")
+              );
+            }
+            return parts.join("\n");
+          })
+          .filter(Boolean)
+          .join("\n\n")
+    )
+    .join("\n\n")
+    .slice(0, 24_000); // hard cap so huge courses can't blow the context window
+}
+
+/* ----------------------------- user context ----------------------------- */
+
+interface UserContext {
+  name?: string;
+  level?: number;
+  xp?: number;
+  streak?: number;
+  dailyGoalMinutes?: number;
+  knowledgeLevel?: string;
+  learningExp?: string;
+  reason?: string;
+  graspMethod?: string;
+  focusEnemy?: string;
+  placementLevel?: string;
+  courseProgress: {
+    completedCount?: number;
+    totalCount?: number;
+    completedTitles: string[];
+    nextTitle?: string;
+    quizScore?: number;
+    quizPassed?: boolean;
+  };
+}
+
+function clampNum(v: unknown, min: number, max: number): number | undefined {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) && n >= min && n <= max ? n : undefined;
+}
+
+function cleanUserContext(raw: unknown): UserContext {
+  if (typeof raw !== "object" || raw === null) {
+    return { courseProgress: { completedTitles: [] } };
+  }
+  const o = raw as Record<string, unknown>;
+  const cp =
+    typeof o.courseProgress === "object" && o.courseProgress !== null
+      ? (o.courseProgress as Record<string, unknown>)
+      : {};
+  return {
+    name: cleanString(o.name, 40) || undefined,
+    level: clampNum(o.level, 0, 1000),
+    xp: clampNum(o.xp, 0, 10_000_000),
+    streak: clampNum(o.streak, 0, 3650),
+    dailyGoalMinutes: clampNum(o.dailyGoalMinutes, 1, 480),
+    knowledgeLevel: cleanString(o.knowledgeLevel, 30) || undefined,
+    learningExp: cleanString(o.learningExp, 30) || undefined,
+    reason: cleanString(o.reason, 30) || undefined,
+    graspMethod: cleanString(o.graspMethod, 30) || undefined,
+    focusEnemy: cleanString(o.focusEnemy, 30) || undefined,
+    placementLevel: cleanString(o.placementLevel, 30) || undefined,
+    courseProgress: {
+      completedCount: clampNum(cp.completedCount, 0, 500),
+      totalCount: clampNum(cp.totalCount, 0, 500),
+      completedTitles: Array.isArray(cp.completedTitles)
+        ? (cp.completedTitles as unknown[])
+            .map((x) => cleanString(x, 80))
+            .filter(Boolean)
+            .slice(0, 15)
+        : [],
+      nextTitle: cleanString(cp.nextTitle, 80) || undefined,
+      quizScore: clampNum(cp.quizScore, 0, 100),
+      quizPassed:
+        typeof cp.quizPassed === "boolean" ? cp.quizPassed : undefined,
+    },
+  };
+}
+
+/** One-sentence summary of who the student is, for the system prompt. */
+function userContextBlock(ctx: UserContext, locale: "id" | "en"): string {
+  const parts: string[] = [];
+  if (ctx.name) parts.push(locale === "en" ? `Their name is ${ctx.name}.` : `Namanya ${ctx.name}.`);
+  const stats = [
+    ctx.level !== undefined && `level ${ctx.level}`,
+    ctx.xp !== undefined && `${ctx.xp} XP`,
+    ctx.streak !== undefined &&
+      ctx.streak > 0 &&
+      (locale === "en" ? `${ctx.streak}-day streak` : `streak ${ctx.streak} hari`),
+  ].filter(Boolean);
+  if (stats.length > 0) {
+    parts.push(locale === "en" ? `Platform stats: ${stats.join(", ")}.` : `Statistik platform: ${stats.join(", ")}.`);
+  }
+  if (ctx.dailyGoalMinutes !== undefined) {
+    parts.push(
+      locale === "en"
+        ? `Daily learning goal: ${ctx.dailyGoalMinutes} minutes.`
+        : `Target belajar harian: ${ctx.dailyGoalMinutes} menit.`
+    );
+  }
+  const traits: [string | undefined, string, string][] = [
+    [ctx.knowledgeLevel, "Self-reported knowledge:", "Pengetahuan yang mereka laporkan sendiri:"],
+    [ctx.learningExp, "Prior learning experience:", "Pengalaman belajar sebelumnya:"],
+    [ctx.reason, "Motivation for learning:", "Motivasi belajar:"],
+    [ctx.graspMethod, "Prefers explanations via:", "Lebih suka penjelasan lewat:"],
+    [ctx.focusEnemy, "Main distraction:", "Pengganggu utama:"],
+    [ctx.placementLevel, "Diagnostic placement result:", "Hasil tes penempatan diagnostik:"],
+  ];
+  for (const [value, en, id] of traits) {
+    if (value) parts.push(`${locale === "en" ? en : id} ${value}`);
+  }
+
+  const p = ctx.courseProgress;
+  if (p.completedCount !== undefined || p.totalCount !== undefined) {
+    parts.push(
+      locale === "en"
+        ? `Course progress so far: ${p.completedCount ?? 0}/${p.totalCount ?? "?"} lessons completed.`
+        : `Progres kursus sejauh ini: ${p.completedCount ?? 0}/${p.totalCount ?? "?"} pelajaran selesai.`
+    );
+  }
+  if (p.completedTitles.length > 0) {
+    parts.push(
+      locale === "en"
+        ? `Lessons already completed: ${p.completedTitles.join(", ")}.`
+        : `Pelajaran yang sudah selesai: ${p.completedTitles.join(", ")}.`
+    );
+  }
+  if (p.nextTitle) {
+    parts.push(locale === "en" ? `Next lesson: "${p.nextTitle}".` : `Pelajaran berikutnya: "${p.nextTitle}".`);
+  }
+  if (p.quizScore !== undefined) {
+    const suffix =
+      p.quizPassed === true
+        ? locale === "en"
+          ? " (passed)"
+          : " (lulus)"
+        : p.quizPassed === false
+          ? locale === "en"
+            ? " (not passed yet)"
+            : " (belum lulus)"
+          : "";
+    parts.push(
+      locale === "en"
+        ? `Final-quiz score: ${p.quizScore}%${suffix}.`
+        : `Nilai kuis akhir: ${p.quizScore}%${suffix}.`
+    );
+  }
+  return parts.join(" ");
 }
 
 /* -------------------------------- call AI ------------------------------ */
@@ -156,6 +353,12 @@ function cleanFlashcards(raw: unknown): { front: string; back: string }[] {
 /* -------------------------------- route -------------------------------- */
 
 export async function POST(request: Request) {
+  // Require a signed-in Clerk user before spending any AI quota.
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -171,6 +374,7 @@ export async function POST(request: Request) {
   const locale = cleanString(body?.locale, 5) === "en" ? "en" : "id";
   const course = cleanCourse(body?.course);
   const outline = courseOutline(course);
+  const material = courseMaterial(course);
   const langInstr =
     locale === "en" ? "Write in English." : "Write in Bahasa Indonesia.";
 
@@ -249,10 +453,23 @@ Create exactly 5 questions. Each has exactly 4 options and one correct answer. c
           .filter((m) => m.content)
       : [];
 
+    const userCtx = cleanUserContext(body?.userContext);
+    const aboutStudent = userContextBlock(userCtx, locale);
+    const personalInstr =
+      locale === "en"
+        ? "Use this context to personalize your answers (address the student by name when it feels natural, match explanations to their level and preferred learning style, and reference their progress when relevant)."
+        : "Gunakan konteks ini untuk mempersonalisasi jawabanmu (panggil nama siswa kalau terasa natural, sesuaikan penjelasan dengan level dan gaya belajar mereka, dan rujuk progresnya bila relevan).";
+
+    const materialBlock = material
+      ? locale === "en"
+        ? `\nThe full course material you must ground your answers in (quote/paraphrase it rather than inventing content):\n${material}\n`
+        : `\nMateri lengkap kursus yang harus menjadi dasar jawabanmu (kutip/parafrase materi ini, jangan mengarang isi sendiri):\n${material}\n`
+      : "";
+
     const systemPrompt =
       locale === "en"
-        ? `You are a friendly learning assistant for the online course "${course.title}". Course description: ${course.description}. Course outline:\n${outline}\nAnswer the student's questions clearly, concisely, and helpfully in English. Stay on-topic about the course material.`
-        : `Kamu adalah asisten belajar yang ramah untuk kursus online "${course.title}". Deskripsi kursus: ${course.description}. Garis besar kursus:\n${outline}\nJawab pertanyaan siswa dengan jelas, ringkas, dan membantu dalam Bahasa Indonesia. Tetap fokus pada materi kursus.`;
+        ? `You are a friendly learning assistant for the online course "${course.title}". Course description: ${course.description}. Course outline:\n${outline}${materialBlock}\nAbout the student: ${aboutStudent || "unknown"}\n${personalInstr}\nAnswer the student's questions clearly, concisely, and helpfully in English. Stay on-topic about the course material.`
+        : `Kamu adalah asisten belajar yang ramah untuk kursus online "${course.title}". Deskripsi kursus: ${course.description}. Garis besar kursus:\n${outline}${materialBlock}\nTentang siswa: ${aboutStudent || "belum diketahui"}\n${personalInstr}\nJawab pertanyaan siswa dengan jelas, ringkas, dan membantu dalam Bahasa Indonesia. Tetap fokus pada materi kursus.`;
 
     const answer = await callAIChat(systemPrompt, history, question);
     return NextResponse.json({ answer });

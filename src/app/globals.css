@@ -43,7 +43,14 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 6.5rem;
+  /* Offset anchor jumps below the fixed navbar (mobile 64px, desktop 96px) */
+  scroll-padding-top: 5rem;
+}
+
+@media (min-width: 768px) {
+  html {
+    scroll-padding-top: 6.5rem;
+  }
 }
 
 body {
@@ -261,6 +268,26 @@ body::before {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* TextType typewriter (React Bits) */
+.text-type {
+  display: inline-block;
+  white-space: pre-wrap;
+}
+
+.text-type__inner {
+  display: inline;
+}
+
+.text-type__cursor {
+  margin-left: 0.25rem;
+  display: inline-block;
+  opacity: 1;
+}
+
+.text-type__cursor--hidden {
+  display: none;
 }
 
 /* Futuristic card hover effect */

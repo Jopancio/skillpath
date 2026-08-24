@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { motion } from "framer-motion";
@@ -57,10 +57,21 @@ function QuizContent({ course }: { course: Course }) {
   const [phase, setPhase] = useState<Phase>("answering");
   const [timeLeft, setTimeLeft] = useState(QUIZ_SECONDS);
   const [finalScore, setFinalScore] = useState(0);
+  const [jumpedIdx, setJumpedIdx] = useState<number | null>(null);
+  const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const total = course.quiz.length;
   const answeredCount = Object.keys(answers).length;
   const allAnswered = answeredCount === total;
+
+  // Scroll to + highlight the first question without an answer
+  function jumpToUnanswered() {
+    const idx = course.quiz.findIndex((_, i) => answers[i] === undefined);
+    if (idx === -1) return;
+    questionRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setJumpedIdx(idx);
+    setTimeout(() => setJumpedIdx((cur) => (cur === idx ? null : cur)), 1800);
+  }
 
   // Timer
   useEffect(() => {
@@ -152,11 +163,17 @@ function QuizContent({ course }: { course: Course }) {
             {course.quiz.map((q, qi) => (
               <motion.div
                 key={q.id}
+                ref={(el) => {
+                  questionRefs.current[qi] = el;
+                }}
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35 }}
-                className="rounded-2xl border border-border bg-card p-5 shadow-card"
+                className={cn(
+                  "rounded-2xl border border-border bg-card p-5 shadow-card transition-colors",
+                  jumpedIdx === qi && "border-primary ring-2 ring-primary/40"
+                )}
               >
                 <p className="font-display text-sm font-bold">
                   <span className="mr-2 text-primary">
@@ -203,12 +220,17 @@ function QuizContent({ course }: { course: Course }) {
           <div className="sticky bottom-4 mt-8">
             <div className="rounded-2xl border border-border bg-card/95 p-4 shadow-soft backdrop-blur">
               <Button
-                onClick={submit}
-                disabled={!allAnswered}
+                onClick={() => {
+                  if (allAnswered) {
+                    submit();
+                  } else {
+                    jumpToUnanswered();
+                  }
+                }}
                 className="w-full"
                 size="lg"
               >
-                {t.quiz.submit}
+                {allAnswered ? t.quiz.submit : t.common.next}
                 <ChevronRight className="h-5 w-5" />
               </Button>
               {!allAnswered && (

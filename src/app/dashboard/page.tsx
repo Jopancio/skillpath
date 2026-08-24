@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -19,7 +20,8 @@ import { useCustomCourses } from "@/hooks/use-custom-courses";
 import { useBadges } from "@/hooks/use-badges";
 import { courseLessonIds, isCourseComplete } from "@/data/courses";
 import { courseStats } from "@/data/types";
-import { leaderboard } from "@/data/badges";
+import type { Course } from "@/data/types";
+import { useLeaderboard } from "@/hooks/use-leaderboard";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { ButtonLink } from "@/components/ui/button";
 import { DynamicIcon } from "@/components/ui/icon-map";
@@ -41,10 +43,22 @@ export default function DashboardPage() {
   } = useProgress();
   const { allCourses } = useCustomCourses();
   const badges = useBadges();
+  const { entries: boardEntries, hydrated: boardHydrated } = useLeaderboard();
 
-  const startedCourses = allCourses.filter((c) =>
-    courseLessonIds(c).some((id) => completedLessons.has(id))
-  );
+  // All courses the user picked during onboarding (even not started yet),
+  // plus any other course they have already begun — each with its progress.
+  const myCourses = useMemo(() => {
+    const pickedIds = onboarding?.interests ?? [];
+    const picked = pickedIds
+      .map((id) => allCourses.find((c) => c.id === id))
+      .filter((c): c is Course => c !== undefined);
+    const extraStarted = allCourses.filter(
+      (c) =>
+        !pickedIds.includes(c.id) &&
+        courseLessonIds(c).some((id) => completedLessons.has(id))
+    );
+    return [...picked, ...extraStarted];
+  }, [allCourses, onboarding, completedLessons]);
   const earnedCount = badges.filter((b) => b.earned).length;
 
   return (
@@ -149,7 +163,7 @@ export default function DashboardPage() {
           <h2 className="font-display text-xl font-extrabold">
             {t.dashboard.myCourses}
           </h2>
-          {startedCourses.length === 0 ? (
+          {myCourses.length === 0 ? (
             <div className="mt-4 rounded-2xl border border-dashed border-border bg-card p-10 text-center">
               <p className="text-muted">{t.dashboard.noCourses}</p>
               <div className="mt-4">
@@ -158,7 +172,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="mt-4 space-y-4">
-              {startedCourses.map((c) => {
+              {myCourses.map((c) => {
                 const ids = courseLessonIds(c);
                 const done = ids.filter((id) => completedLessons.has(id)).length;
                 const pct = Math.round((done / ids.length) * 100);
@@ -210,7 +224,7 @@ export default function DashboardPage() {
                     ) : nextId ? (
                       <ButtonLink href={`/learn/${c.id}/${nextId}`} size="sm">
                         <PlayCircle className="h-4 w-4" />
-                        {t.common.continue}
+                        {done === 0 ? t.courses.startCourse : t.common.continue}
                       </ButtonLink>
                     ) : null}
                   </motion.div>
@@ -224,47 +238,70 @@ export default function DashboardPage() {
             {t.dashboard.leaderboard}
           </h2>
           <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card shadow-card">
-            {leaderboard.map((entry, i) => (
-              <div
-                key={entry.name}
-                className={cn(
-                  "flex items-center gap-3 border-b border-border px-5 py-3.5 last:border-0",
-                  i < 3 && "bg-background/60"
-                )}
-              >
-                <span
+            {!boardHydrated ? (
+              // Skeleton rows while the board loads
+              [0, 1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 border-b border-border px-5 py-3.5 last:border-0"
+                >
+                  <span className="h-4 w-6 animate-pulse rounded bg-border/60" />
+                  <span className="h-9 w-9 animate-pulse rounded-full bg-border/60" />
+                  <span className="h-4 flex-1 animate-pulse rounded bg-border/60" />
+                </div>
+              ))
+            ) : (
+              boardEntries.map((entry) => (
+                <div
+                  key={entry.userId}
                   className={cn(
-                    "w-6 text-center font-display text-sm font-extrabold",
-                    i === 0 && "text-amber-400",
-                    i === 1 && "text-muted",
-                    i === 2 && "text-accent-2"
+                    "flex items-center gap-3 border-b border-border px-5 py-3.5 last:border-0",
+                    entry.rank <= 3 && "bg-background/60"
                   )}
                 >
-                  {i === 0 ? <Trophy className="inline h-4 w-4" /> : i + 1}
-                </span>
-                <span
-                  className="flex h-9 w-9 items-center justify-center rounded-full font-display text-xs font-extrabold text-white"
-                  style={{ backgroundColor: entry.avatarColor }}
-                >
-                  {entry.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .slice(0, 2)
-                    .join("")}
-                </span>
-                <span className="flex-1 truncate text-sm font-bold">
-                  {entry.name}
-                </span>
-                <span className="flex items-center gap-1 text-xs font-bold text-accent-2">
-                  <Flame className="h-3.5 w-3.5" />
-                  {entry.streak}
-                </span>
-                <span className="flex items-center gap-1 text-xs font-extrabold text-amber-400">
-                  <Zap className="h-3.5 w-3.5" />
-                  {entry.xp}
-                </span>
-              </div>
-            ))}
+                  <span
+                    className={cn(
+                      "w-6 text-center font-display text-sm font-extrabold",
+                      entry.rank === 1 && "text-amber-400",
+                      entry.rank === 2 && "text-muted",
+                      entry.rank === 3 && "text-accent-2"
+                    )}
+                  >
+                    {entry.rank === 1 ? (
+                      <Trophy className="inline h-4 w-4" />
+                    ) : (
+                      entry.rank
+                    )}
+                  </span>
+                  <span
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-xs font-extrabold text-white"
+                    style={{ backgroundColor: entry.avatarColor }}
+                  >
+                    {entry.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .slice(0, 2)
+                      .join("")}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-sm font-bold">
+                    {entry.name}
+                  </span>
+                  {entry.isCurrentUser && (
+                    <span className="shrink-0 rounded-full bg-secondary/10 px-2 py-0.5 text-[10px] font-extrabold text-secondary">
+                      {t.dashboard.you}
+                    </span>
+                  )}
+                  <span className="flex shrink-0 items-center gap-1 text-xs font-bold text-accent-2">
+                    <Flame className="h-3.5 w-3.5" />
+                    {entry.streak}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-xs font-extrabold text-amber-400">
+                    <Zap className="h-3.5 w-3.5" />
+                    {entry.xp}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

@@ -35,6 +35,7 @@ export const id = {
     badge: "Platform belajar skill nonformal #1",
     titleA: "Kuasai Skill Kerja",
     titleB: "Tanpa Kuliah",
+    titleBRotating: ["Tanpa Kuliah", "Tanpa Biaya Mahal", "Sambil Kerja", "Cara Seru"],
     subtitle:
       "Belajar barista, content creator, digital marketing, dan skill praktis lainnya dengan cara yang seru seperti bermain game. Gratis, fleksibel, dan langsung siap kerja.",
     cta: "Mulai Gratis Sekarang",

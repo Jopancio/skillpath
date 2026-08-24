@@ -84,20 +84,3 @@ export const badges: Badge[] = [
 export function getBadge(id: string): Badge | undefined {
   return badges.find((b) => b.id === id);
 }
-
-export interface LeaderboardEntry {
-  name: string;
-  xp: number;
-  streak: number;
-  avatarColor: string;
-}
-
-export const leaderboard: LeaderboardEntry[] = [
-  { name: "Rani Puspita", xp: 1240, streak: 21, avatarColor: "#FF6B2C" },
-  { name: "Bagas Wicaksono", xp: 980, streak: 14, avatarColor: "#3B82F6" },
-  { name: "Siti Maemunah", xp: 860, streak: 12, avatarColor: "#EC4899" },
-  { name: "Andi Pratama", xp: 720, streak: 9, avatarColor: "#F4B942" },
-  { name: "Dewi Anggraini", xp: 655, streak: 7, avatarColor: "#8B5CF6" },
-  { name: "Rizky Ramadhan", xp: 540, streak: 6, avatarColor: "#D94A16" },
-  { name: "Putri Ayu", xp: 430, streak: 5, avatarColor: "#22C55E" },
-];

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import {
   buildPrompt,
   extractJSON,
@@ -137,6 +138,12 @@ function rateLimited(): boolean {
 }
 
 export async function POST(request: Request) {
+  // Require a signed-in Clerk user before spending any AI quota.
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const apiKey = process.env.COSMOSHUB_API_KEY;
   if (!apiKey) {
     return NextResponse.json(

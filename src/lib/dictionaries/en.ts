@@ -39,6 +39,7 @@ export const en: Dict = {
     badge: "The #1 informal skill learning platform",
     titleA: "Master Job Skills",
     titleB: "No Degree Needed",
+    titleBRotating: ["No Degree Needed", "Without Student Debt", "While Working", "The Fun Way"],
     subtitle:
       "Learn barista skills, content creation, digital marketing, and other practical skills in a fun, game-like way. Free, flexible, and job-ready.",
     cta: "Start Free Now",

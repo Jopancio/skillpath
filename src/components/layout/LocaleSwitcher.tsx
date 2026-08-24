@@ -30,15 +30,15 @@ export function LocaleSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex h-14 items-center gap-2 rounded-full border-2 border-border bg-card px-5 text-lg font-bold text-foreground shadow-sm transition-colors hover:bg-background"
+        className="flex h-10 items-center gap-1.5 rounded-full border border-border bg-card px-3.5 text-sm font-bold text-foreground shadow-sm transition-colors hover:bg-background md:h-14 md:gap-2 md:border-2 md:px-5 md:text-lg"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <Languages className="h-6 w-6 text-muted" aria-hidden />
+        <Languages className="h-4.5 w-4.5 text-muted md:h-6 md:w-6" aria-hidden />
         {locale.toUpperCase()}
         <ChevronDown
           className={cn(
-            "h-5 w-5 text-muted transition-transform",
+            "h-4 w-4 text-muted transition-transform md:h-5 md:w-5",
             open && "rotate-180"
           )}
           aria-hidden
