@@ -73,6 +73,8 @@ interface PersistedState {
   lastActive: string; // YYYY-MM-DD
   completedLessons: string[];
   quizResults: Record<string, QuizResult>;
+  /** End-of-chapter quiz results, keyed `${courseId}::${moduleId}` (kept separate from final-quiz results). */
+  moduleQuizResults?: Record<string, QuizResult>;
   userName: string;
   onboarded: boolean;
   onboarding: OnboardingData | null;
@@ -85,6 +87,7 @@ const initialState: PersistedState = {
   lastActive: "",
   completedLessons: [],
   quizResults: {},
+  moduleQuizResults: {},
   userName: "",
   onboarded: false,
   onboarding: null,
@@ -94,10 +97,14 @@ const initialState: PersistedState = {
 interface ProgressContextValue {
   xp: number;
   streak: number;
+  /** YYYY-MM-DD of the last active day (drives the dashboard streak-risk nudge). */
+  lastActive: string;
   level: number;
   levelProgress: { current: number; needed: number; percent: number };
   completedLessons: ReadonlySet<string>;
   quizResults: Record<string, QuizResult>;
+  /** Chapter-quiz results keyed `${courseId}::${moduleId}`. */
+  moduleQuizResults: Record<string, QuizResult>;
   userName: string;
   onboarded: boolean;
   onboarding: OnboardingData | null;
@@ -106,6 +113,12 @@ interface ProgressContextValue {
   hydrated: boolean;
   completeLesson: (lessonId: string, xp: number) => void;
   recordQuiz: (courseId: string, score: number, passed: boolean) => void;
+  recordModuleQuiz: (
+    courseId: string,
+    moduleId: string,
+    score: number,
+    passed: boolean
+  ) => void;
   setUserName: (name: string) => void;
   completeOnboarding: (data: OnboardingData & { name?: string }) => void;
   setPlacement: (result: PlacementResult) => void;
@@ -150,6 +163,7 @@ function ProgressInner({
       onboarded: raw.onboarded ?? false,
       onboarding: raw.onboarding ?? null,
       placement: raw.placement ?? null,
+      moduleQuizResults: raw.moduleQuizResults ?? {},
     };
     // Streak continuity check
     const today = todayKey();
@@ -271,6 +285,33 @@ function ProgressInner({
     setState((s) => ({ ...s, userName: name }));
   }, []);
 
+  // Chapter quizzes live in their own record so badges/certificates that read
+  // `quizResults` only ever react to the final course quiz.
+  const recordModuleQuiz = useCallback(
+    (courseId: string, moduleId: string, score: number, passed: boolean) => {
+      const key = `${courseId}::${moduleId}`;
+      setState((s) => {
+        const prev = s.moduleQuizResults?.[key];
+        const firstPass = passed && !prev?.passed;
+        const bestScore = Math.max(prev?.score ?? 0, score);
+        const next: PersistedState = {
+          ...s,
+          xp: firstPass ? s.xp + 40 : s.xp,
+          moduleQuizResults: {
+            ...(s.moduleQuizResults ?? {}),
+            [key]: {
+              score: bestScore,
+              passed: (prev?.passed ?? false) || passed,
+              date: todayKey(),
+            },
+          },
+        };
+        return touchStreak(next);
+      });
+    },
+    [touchStreak]
+  );
+
   const completeOnboarding = useCallback(
     (data: OnboardingData & { name?: string }) => {
       setState((s) => {
@@ -323,6 +364,7 @@ function ProgressInner({
     () => ({
       xp: state.xp,
       streak: state.streak,
+      lastActive: state.lastActive,
       level: progress.level,
       levelProgress: {
         current: progress.current,
@@ -331,6 +373,7 @@ function ProgressInner({
       },
       completedLessons: new Set(state.completedLessons),
       quizResults: state.quizResults,
+      moduleQuizResults: state.moduleQuizResults ?? {},
       userName: state.userName,
       onboarded: state.onboarded,
       onboarding: state.onboarding,
@@ -339,13 +382,14 @@ function ProgressInner({
       hydrated,
       completeLesson,
       recordQuiz,
+      recordModuleQuiz,
       setUserName,
       completeOnboarding,
       setPlacement,
       setDailyGoal,
       resetAll,
     }),
-    [state, lessonsCompletedCount, hydrated, completeLesson, recordQuiz, setUserName, completeOnboarding, setPlacement, setDailyGoal, resetAll, progress]
+    [state, lessonsCompletedCount, hydrated, completeLesson, recordQuiz, recordModuleQuiz, setUserName, completeOnboarding, setPlacement, setDailyGoal, resetAll, progress]
   );
 
   return (

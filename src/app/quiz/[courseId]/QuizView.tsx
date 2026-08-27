@@ -28,9 +28,12 @@ type Phase = "answering" | "result";
 export function QuizView({
   courseId,
   initialCourse,
+  initialModuleId,
 }: {
   courseId: string;
   initialCourse?: Course;
+  /** When set, run this module's end-of-chapter quiz instead of the final exam. */
+  initialModuleId?: string;
 }) {
   const { t } = useI18n();
   const { getCourseById, hydrated: coursesHydrated } = useCustomCourses();
@@ -46,12 +49,24 @@ export function QuizView({
 
   const resolved = initialCourse ?? getCourseById(courseId);
   if (!resolved) notFound();
-  return <QuizContent course={resolved} />;
+  return <QuizContent course={resolved} initialModuleId={initialModuleId} />;
 }
 
-function QuizContent({ course }: { course: Course }) {
+function QuizContent({
+  course,
+  initialModuleId,
+}: {
+  course: Course;
+  initialModuleId?: string;
+}) {
   const { t, locale } = useI18n();
-  const { recordQuiz, quizResults, hydrated } = useProgress();
+  const {
+    recordQuiz,
+    recordModuleQuiz,
+    quizResults,
+    moduleQuizResults,
+    hydrated,
+  } = useProgress();
 
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [phase, setPhase] = useState<Phase>("answering");
@@ -60,13 +75,23 @@ function QuizContent({ course }: { course: Course }) {
   const [jumpedIdx, setJumpedIdx] = useState<number | null>(null);
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const total = course.quiz.length;
+  // Chapter mode: opened with ?module=<id> on a module that has its own
+  // end-of-chapter quiz ("Kuis 1", "Kuis 2", ...). Falls back to the final
+  // course exam when the id is unknown or the module has no quiz.
+  const mod = initialModuleId
+    ? course.modules.find((m) => m.id === initialModuleId)
+    : undefined;
+  const quizList = mod && mod.quiz && mod.quiz.length > 0 ? mod.quiz : course.quiz;
+  const isModuleQuiz = quizList !== course.quiz;
+  const moduleIdx = mod ? course.modules.findIndex((m) => m.id === mod.id) : -1;
+
+  const total = quizList.length;
   const answeredCount = Object.keys(answers).length;
   const allAnswered = answeredCount === total;
 
   // Scroll to + highlight the first question without an answer
   function jumpToUnanswered() {
-    const idx = course.quiz.findIndex((_, i) => answers[i] === undefined);
+    const idx = quizList.findIndex((_, i) => answers[i] === undefined);
     if (idx === -1) return;
     questionRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "center" });
     setJumpedIdx(idx);
@@ -89,13 +114,19 @@ function QuizContent({ course }: { course: Course }) {
   const ss = String(timeLeft % 60).padStart(2, "0");
 
   function submit() {
-    const correct = course.quiz.filter(
+    const correct = quizList.filter(
       (q, i) => answers[i] === q.correctIndex
     ).length;
     const score = Math.round((correct / total) * 100);
     setFinalScore(score);
     const passed = score >= course.passScore;
-    recordQuiz(course.id, score, passed);
+    // Chapter quizzes are stored separately so badges/certificates that read
+    // `quizResults` keep reacting to the final exam only.
+    if (mod && isModuleQuiz) {
+      recordModuleQuiz(course.id, mod.id, score, passed);
+    } else {
+      recordQuiz(course.id, score, passed);
+    }
     setPhase("result");
     if (passed) {
       confetti({
@@ -116,7 +147,22 @@ function QuizContent({ course }: { course: Course }) {
   }
 
   const passed = finalScore >= course.passScore;
-  const prevResult = hydrated ? quizResults[course.id] : undefined;
+  const prevResult = hydrated
+    ? mod && isModuleQuiz
+      ? moduleQuizResults[`${course.id}::${mod.id}`]
+      : quizResults[course.id]
+    : undefined;
+
+  // After passing a chapter quiz: continue into the next chapter's first
+  // lesson, or head to the final exam when this was the last chapter.
+  let nextHref: string | undefined;
+  if (mod && moduleIdx >= 0) {
+    const nextMod = course.modules[moduleIdx + 1];
+    nextHref =
+      nextMod && nextMod.lessons.length > 0
+        ? `/learn/${course.id}/${nextMod.lessons[0].id}`
+        : `/quiz/${course.id}`;
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
@@ -134,10 +180,14 @@ function QuizContent({ course }: { course: Course }) {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
             <div>
               <h1 className="font-display text-xl font-extrabold">
-                {t.quiz.title}
+                {isModuleQuiz
+                  ? `${t.quiz.moduleQuizLabel} ${moduleIdx + 1}`
+                  : t.quiz.title}
               </h1>
               <p className="text-xs font-semibold text-muted">
-                {t.quiz.subtitle}
+                {isModuleQuiz && mod
+                  ? `${pick(locale, mod.title)} · ${t.quiz.moduleSubtitle}`
+                  : t.quiz.subtitle}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -160,7 +210,7 @@ function QuizContent({ course }: { course: Course }) {
 
           {/* Questions */}
           <div className="mt-6 space-y-6">
-            {course.quiz.map((q, qi) => (
+            {quizList.map((q, qi) => (
               <motion.div
                 key={q.id}
                 ref={(el) => {
@@ -251,6 +301,10 @@ function QuizContent({ course }: { course: Course }) {
           answers={answers}
           onRetake={retake}
           prevBest={prevResult?.score}
+          isModuleQuiz={isModuleQuiz && Boolean(mod)}
+          moduleTitle={mod ? pick(locale, mod.title) : undefined}
+          nextHref={nextHref}
+          questions={quizList}
         />
       )}
     </div>
@@ -264,6 +318,10 @@ function ResultView({
   answers,
   onRetake,
   prevBest,
+  isModuleQuiz,
+  moduleTitle,
+  nextHref,
+  questions,
 }: {
   course: Course;
   score: number;
@@ -271,6 +329,11 @@ function ResultView({
   answers: Record<number, number>;
   onRetake: () => void;
   prevBest?: number;
+  isModuleQuiz?: boolean;
+  moduleTitle?: string;
+  /** Where "continue" goes after passing a chapter quiz. */
+  nextHref?: string;
+  questions: typeof course.quiz;
 }) {
   const { t, locale } = useI18n();
   const [showReview, setShowReview] = useState(false);
@@ -307,6 +370,9 @@ function ResultView({
         <h2 className="mt-5 font-display text-2xl font-extrabold">
           {passed ? t.quiz.passed : t.quiz.failed}
         </h2>
+        {isModuleQuiz && moduleTitle && (
+          <p className="mt-1 text-xs font-bold text-muted">{moduleTitle}</p>
+        )}
 
         <div className="mx-auto mt-6 grid max-w-xs grid-cols-2 gap-3">
           <div className="rounded-2xl border border-border bg-card p-4">
@@ -326,16 +392,24 @@ function ResultView({
         {passed && (
           <p className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-accent/20 px-4 py-1.5 text-sm font-extrabold text-amber-400">
             <Award className="h-4 w-4" />
-            +100 XP
+            {isModuleQuiz ? "+40 XP" : "+100 XP"}
           </p>
         )}
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {passed ? (
-            <ButtonLink href={`/certificate/${course.id}`} size="lg">
-              <Award className="h-5 w-5" />
-              {t.quiz.getCertificate}
-            </ButtonLink>
+            isModuleQuiz ? (
+              // Chapter quiz: keep learning instead of a certificate
+              <ButtonLink href={nextHref ?? `/courses/${course.id}`} size="lg">
+                <ChevronRight className="h-5 w-5" />
+                {t.quiz.modulePassedNext}
+              </ButtonLink>
+            ) : (
+              <ButtonLink href={`/certificate/${course.id}`} size="lg">
+                <Award className="h-5 w-5" />
+                {t.quiz.getCertificate}
+              </ButtonLink>
+            )
           ) : (
             <Button onClick={onRetake} size="lg">
               <RotateCcw className="h-5 w-5" />
@@ -356,7 +430,7 @@ function ResultView({
           <h3 className="font-display text-lg font-extrabold">
             {t.quiz.reviewTitle}
           </h3>
-          {course.quiz.map((q, qi) => {
+          {questions.map((q, qi) => {
             const user = answers[qi];
             const correct = q.correctIndex;
             const isRight = user === correct;

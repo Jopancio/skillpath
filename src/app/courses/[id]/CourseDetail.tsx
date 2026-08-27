@@ -32,7 +32,12 @@ import { cn } from "@/lib/utils";
 
 export function CourseDetail({ course: initial }: { course: Course }) {
   const { t, locale } = useI18n();
-  const { completedLessons, quizResults, hydrated } = useProgress();
+  const {
+    completedLessons,
+    quizResults,
+    moduleQuizResults,
+    hydrated,
+  } = useProgress();
   const { getCourseById, hydrated: coursesHydrated } = useCustomCourses();
   // AI-generated courses live in localStorage: swap in once hydrated.
   // After hydration a truly unknown id resolves back to the (already 404'd) builtin.
@@ -192,6 +197,10 @@ export function CourseDetail({ course: initial }: { course: Course }) {
             completedLessons.has(l.id)
           ).length;
           const modPercent = Math.round((modDone / mod.lessons.length) * 100);
+          // End-of-chapter quiz state ("Kuis 1", "Kuis 2", ...)
+          const mq = moduleQuizResults[`${course.id}::${mod.id}`];
+          const chapterQuizReady =
+            unlocked && modDone === mod.lessons.length;
 
           return (
             <motion.div
@@ -301,6 +310,58 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                     </div>
                   );
                 })}
+
+                {/* End-of-chapter quiz node */}
+                {mod.quiz && mod.quiz.length > 0 && (
+                  <div
+                    className={cn(
+                      "mt-3 flex items-center gap-3 rounded-2xl border-2 p-2.5",
+                      mq?.passed
+                        ? "border-success/40 bg-success/5"
+                        : chapterQuizReady
+                          ? "border-accent/50 bg-accent/5"
+                          : "border-dashed border-border opacity-75"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+                        mq?.passed
+                          ? "bg-success text-white"
+                          : chapterQuizReady
+                            ? "bg-accent text-black"
+                            : "bg-border text-muted"
+                      )}
+                    >
+                      {mq?.passed ? (
+                        <CheckCircle2 className="h-4.5 w-4.5" />
+                      ) : chapterQuizReady ? (
+                        <Award className="h-4.5 w-4.5" />
+                      ) : (
+                        <Lock className="h-4 w-4" />
+                      )}
+                    </span>
+                    <span className="flex-1">
+                      <span className="block text-sm font-bold">
+                        {`${t.quiz.moduleQuizLabel} ${mi + 1}`}
+                      </span>
+                      <span className="block text-xs font-semibold text-muted">
+                        {mq?.passed
+                          ? `${t.quiz.yourScore}: ${mq.score}%`
+                          : t.courses.moduleQuizDesc}
+                      </span>
+                    </span>
+                    {chapterQuizReady && !mq?.passed ? (
+                      <ButtonLink
+                        href={`/quiz/${course.id}?module=${mod.id}`}
+                        variant="accent"
+                        size="sm"
+                      >
+                        {t.courses.quiz}
+                      </ButtonLink>
+                    ) : null}
+                  </div>
+                )}
               </div>
             </motion.div>
           );

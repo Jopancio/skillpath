@@ -10,6 +10,14 @@ export function generateStaticParams() {
 
 export default async function QuizPage(props: PageProps<"/quiz/[courseId]">) {
   const { courseId } = await props.params;
+  const sp = await props.searchParams;
+  const moduleId = typeof sp?.module === "string" ? sp.module : undefined;
   const course = getCourse(courseId);
-  return <QuizView courseId={courseId} initialCourse={course} />;
+  return (
+    <QuizView
+      courseId={courseId}
+      initialCourse={course}
+      initialModuleId={moduleId}
+    />
+  );
 }

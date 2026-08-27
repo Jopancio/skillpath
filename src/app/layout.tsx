@@ -42,7 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ClerkProvider>
           <Providers>
           <Navbar />
-          <main className="flex-1 pt-16 md:pt-24">{children}</main>
+          <main className="flex-1 pt-16 lg:pt-20">{children}</main>
           <Footer />
           </Providers>
         </ClerkProvider>

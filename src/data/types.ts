@@ -40,6 +40,8 @@ export interface CourseModule {
   id: string;
   title: Localized;
   lessons: Lesson[];
+  /** End-of-chapter quiz ("Kuis 1", "Kuis 2", ...). Optional: legacy/builtin courses only have the final quiz. */
+  quiz?: QuizQuestion[];
 }
 
 export interface Course {

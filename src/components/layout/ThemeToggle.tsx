@@ -12,11 +12,17 @@ export function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Ganti tema terang/gelap"
       title="Ganti Tema"
-      className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-foreground shadow-sm transition-all hover:scale-105 hover:bg-background md:h-14 md:w-14 md:border-2"
+      className="group flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card/80 text-foreground shadow-sm backdrop-blur transition-all duration-200 hover:border-primary/40 hover:bg-background hover:shadow-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 active:scale-90"
     >
       {/* Icon picks the right variant via CSS so it never flashes on load */}
-      <Sun className="hidden h-5 w-5 md:h-7 md:w-7 dark:block" aria-hidden />
-      <Moon className="h-5 w-5 md:h-7 md:w-7 dark:hidden" aria-hidden />
+      <Sun
+        className="hidden h-[18px] w-[18px] transition-transform duration-500 group-hover:rotate-90 dark:block"
+        aria-hidden
+      />
+      <Moon
+        className="h-[18px] w-[18px] transition-transform duration-500 group-hover:-rotate-12 dark:hidden"
+        aria-hidden
+      />
     </button>
   );
 }

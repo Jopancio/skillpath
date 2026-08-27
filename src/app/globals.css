@@ -242,6 +242,16 @@ body::before {
   animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Honor OS reduced-motion for decorative CSS loops */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-marquee,
+  .animate-pulse-ring,
+  .animate-shimmer {
+    animation: none;
+  }
+}
+
 /* Shimmer loading effect */
 @keyframes shimmer {
   0% {
@@ -299,6 +309,49 @@ body::before {
   box-shadow:
     0 12px 40px -8px rgb(255 107 44 / 0.2),
     0 0 0 1px rgb(255 107 44 / 0.1);
+}
+
+/* ===== Login page ===== */
+
+/* Rotating gradient beam around the auth card. The ::before sits under the
+   card itself (card child must be `relative`), so only the edge glows. */
+@keyframes sp-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+.auth-beam {
+  position: relative;
+}
+.auth-beam::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: 0;
+  border-radius: calc(2rem + 3px);
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 288deg,
+    rgb(255 107 44 / 0.9) 315deg,
+    rgb(244 185 66 / 0.9) 342deg,
+    transparent 360deg
+  );
+  animation: sp-spin 6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-beam::before {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Fading dot grid helper */
+.dot-grid {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-border) 75%, transparent) 1.2px,
+    transparent 1.3px
+  );
+  background-size: 26px 26px;
 }
 
 /* Cross-page transition (signup success -> onboarding wizard) */

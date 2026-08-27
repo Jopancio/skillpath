@@ -70,7 +70,7 @@ function LessonContent({
   lesson: Lesson;
 }) {
   const { t, locale } = useI18n();
-  const { completeLesson, completedLessons } = useProgress();
+  const { completeLesson, completedLessons, quizResults } = useProgress();
   const router = useRouter();
   const [justCompleted, setJustCompleted] = useState(false);
   const [xpPop, setXpPop] = useState(false);
@@ -100,6 +100,25 @@ function LessonContent({
   }
 
   function goNext() {
+    // End-of-chapter gate: when this lesson completes its chapter and the
+    // module has an end-of-chapter quiz that hasn't been passed, quiz it
+    // before moving on ("Kuis 1", "Kuis 2", ... before the final exam).
+    const loc = findLesson(course, lesson.id);
+    if (loc) {
+      const mod = course.modules[loc.moduleIndex];
+      const modFinished = mod.lessons.every(
+        (l) => completedLessons.has(l.id) || l.id === lesson.id
+      );
+      if (
+        mod?.quiz &&
+        mod.quiz.length > 0 &&
+        modFinished &&
+        !quizResults[`${course.id}::${mod.id}`]?.passed
+      ) {
+        router.push(`/quiz/${course.id}?module=${mod.id}`);
+        return;
+      }
+    }
     if (next) {
       router.push(`/learn/${course.id}/${next.lesson.id}`);
     } else {

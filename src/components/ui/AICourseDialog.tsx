@@ -156,7 +156,8 @@ function DialogInner({
   // (interval cleared on unmount via the generate() finally path)
   const generate = async () => {
     const s = skill.trim();
-    if (s.length < MIN_SKILL_LEN || loading) return;
+    // A topic prompt OR an uploaded PDF is enough to generate
+    if (loading || (s.length < MIN_SKILL_LEN && !pdf)) return;
     setLoading(true);
     setError("");
     setActiveStep(0);
@@ -188,7 +189,8 @@ function DialogInner({
     }
   };
 
-  const canGenerate = skill.trim().length >= MIN_SKILL_LEN && !loading;
+  const canGenerate =
+    (skill.trim().length >= MIN_SKILL_LEN || pdf !== null) && !loading;
 
   return (
     <div className="flex max-h-[90vh] flex-col">
@@ -263,7 +265,9 @@ function DialogInner({
                 {skill.length}/{MAX_SKILL_LEN}
               </span>
             </div>
-            <p className="mt-1.5 text-xs font-semibold text-muted">{ob.aiInputHint}</p>
+            <p className="mt-1.5 text-xs font-semibold text-muted">
+              {pdf ? ob.aiInputHintPdf : ob.aiInputHint}
+            </p>
           </label>
 
           {/* Suggestion chips */}
@@ -472,7 +476,7 @@ function DialogInner({
                     className="h-full rounded-full bg-gradient-to-r from-primary via-deep-orange to-gold"
                     initial={{ width: "5%" }}
                     animate={{ width: "90%" }}
-                    transition={{ duration: 25, ease: "easeOut" }}
+                    transition={{ duration: 120, ease: "easeOut" }}
                   />
                 </div>
                 <p className="mt-3 text-center text-[11px] font-semibold text-muted">
