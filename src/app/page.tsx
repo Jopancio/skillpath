@@ -24,6 +24,7 @@ import { ButtonLink } from "@/components/ui/button";
 import AccordionGallery from "@/components/ui/AccordionGallery";
 import { FaqAccordion } from "@/components/ui/FaqAccordion";
 import TextType from "@/components/ui/TextType";
+import { CinematicFooter } from "@/components/ui/motion-footer";
 
 const featureIcons = [Gamepad2, Map, Wrench, Award];
 export default function HomePage() {
@@ -38,12 +39,10 @@ export default function HomePage() {
     description: f.description,
   }));
   const hasFeatureImages = featureItems.every((f) => Boolean(f.image));
-  // Logged-in users keep learning; guests go to login first.
-  const startHref = user
-    ? hydrated && onboarded
-      ? "/courses"
-      : "/onboarding"
-    : "/login";
+  // Guests start the questionnaire right away; login is only required at the
+  // end of onboarding. Signed-in users resume where they left off.
+  const startHref =
+    user && hydrated && onboarded ? "/courses" : "/onboarding";
 
   return (
     <div>
@@ -337,6 +336,9 @@ export default function HomePage() {
           </div>
         </motion.div>
       </section>
+
+      {/* ===== CINEMATIC FOOTER (curtain reveal) ===== */}
+      <CinematicFooter startHref={startHref} ctaLabel={t.hero.cta} />
     </div>
   );
 }

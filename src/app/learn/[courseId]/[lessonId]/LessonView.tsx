@@ -24,7 +24,7 @@ import { MarkdownText } from "@/components/ui/markdown";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type Props =
+type Props =                                  
   | { course: Course; lesson: Lesson }
   | { courseId: string; lessonId: string };
 
@@ -70,7 +70,7 @@ function LessonContent({
   lesson: Lesson;
 }) {
   const { t, locale } = useI18n();
-  const { completeLesson, completedLessons, quizResults } = useProgress();
+  const { completeLesson, completedLessons, moduleQuizResults } = useProgress();
   const router = useRouter();
   const [justCompleted, setJustCompleted] = useState(false);
   const [xpPop, setXpPop] = useState(false);
@@ -113,7 +113,7 @@ function LessonContent({
         mod?.quiz &&
         mod.quiz.length > 0 &&
         modFinished &&
-        !quizResults[`${course.id}::${mod.id}`]?.passed
+        !moduleQuizResults[`${course.id}::${mod.id}`]?.passed
       ) {
         router.push(`/quiz/${course.id}?module=${mod.id}`);
         return;

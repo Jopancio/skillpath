@@ -11,6 +11,7 @@ import {
   sanitizeModuleBatch,
   sanitizeOutline,
   topicFromPdfName,
+  type AiLocale,
   type ChapterRequest,
   type CourseProfile,
   type DraftQuizQuestion,
@@ -223,11 +224,13 @@ export async function POST(request: Request) {
   let skill = "";
   let profile: CourseProfile | undefined;
   let pdf: PdfReferenceInput | undefined;
+  let locale: AiLocale = "id";
   try {
     const body = await request.json();
     skill = String(body?.skill ?? "").trim().slice(0, MAX_SKILL_LEN);
     profile = sanitizeProfile(body?.profile);
     pdf = await sanitizePdf(body?.pdf);
+    locale = body?.locale === "en" ? "en" : "id";
   } catch (e) {
     if (e instanceof PdfTooLargeError) {
       return NextResponse.json({ error: "pdf_too_large" }, { status: 413 });
@@ -273,7 +276,7 @@ export async function POST(request: Request) {
         apiKey,
         model,
         maxTokens,
-        prompt: buildOutlinePrompt(skill, profile, pdf),
+        prompt: buildOutlinePrompt(skill, profile, pdf, locale),
       })
     );
     const chapters: ChapterRequest[] = outline.modules.map((m, i) => ({
@@ -297,6 +300,7 @@ export async function POST(request: Request) {
         allChapterTitles: outline.modules.map((m) => m.title),
         profile,
         pdf,
+        locale,
       });
       let batch: ModuleDraft[] | null = null;
       let lastErr: unknown = null;
@@ -333,6 +337,7 @@ export async function POST(request: Request) {
               courseTitle: outline.title || skill,
               chapters: outline.modules,
               pdf,
+              locale,
             }),
           })
         );

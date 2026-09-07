@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { extractJSON } from "@/lib/ai-course";
+import { extractJSON, type AiLocale } from "@/lib/ai-course";
 import {
   buildEvaluatePrompt,
   buildResultPrompt,
@@ -178,6 +178,7 @@ export async function POST(request: Request) {
 
   const stage = body?.stage;
   const profile = cleanProfile(body?.profile);
+  const locale: AiLocale = body?.locale === "en" ? "en" : "id";
 
   try {
     if (stage === "style") {
@@ -187,8 +188,8 @@ export async function POST(request: Request) {
       if (!profile) {
         return NextResponse.json({ error: "invalid_body" }, { status: 400 });
       }
-      const raw = await callAI(buildLearningStylePrompt(profile, courses));
-      return NextResponse.json(sanitizeLearningStyleResult(raw));
+      const raw = await callAI(buildLearningStylePrompt(profile, courses, locale));
+      return NextResponse.json(sanitizeLearningStyleResult(raw, locale));
     }
 
     if (stage === "evaluate") {
@@ -198,7 +199,7 @@ export async function POST(request: Request) {
       }
       const clarifications = cleanClarifications(body?.clarifications);
       const raw = await callAI(
-        buildEvaluatePrompt(profile, courses, clarifications)
+        buildEvaluatePrompt(profile, courses, clarifications, locale)
       );
       const result = sanitizeEvaluateResult(raw, courses);
       return NextResponse.json(result);
@@ -222,10 +223,11 @@ export async function POST(request: Request) {
           Math.round((correct / total) * 100),
           correct,
           total,
-          qa
+          qa,
+          locale
         )
       );
-      return NextResponse.json(sanitizePlacementResult(raw));
+      return NextResponse.json(sanitizePlacementResult(raw, locale));
     }
 
     return NextResponse.json({ error: "invalid_stage" }, { status: 400 });

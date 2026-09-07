@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -33,6 +33,7 @@ import { AICourseDialog } from "@/components/ui/AICourseDialog";
 import { SignUpSuccess } from "@/components/auth/SignUpSuccess";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { clearOnboardingDraft, readOnboardingDraft, saveOnboardingDraft, type OnboardingDraft } from "@/lib/onboarding-draft";
 
 const TOTAL_STEPS = 12;
 
@@ -56,14 +57,18 @@ interface PlacementState {
 export default function OnboardingPage() {
   const router = useRouter();
   const { t, locale } = useI18n();
-  const { user } = useAuth();
+  const { user, isLoaded } = useAuth();
   const { hydrated, onboarded, userName, completeOnboarding, setPlacement } =
     useProgress();
-  const { allCourses, addCourse, getCourseById } = useCustomCourses();
+  const { allCourses, addCourse, getCourseById, hydrated: coursesHydrated } = useCustomCourses();
 
-  // Welcome animation plays on every fresh visit (i.e. right after signup);
-  // once the wizard is done, repeat visits are redirected away below.
-  const [celebrating, setCelebrating] = useState(true);
+  // Only an explicit post-signup visit without a draft shows the celebration.
+  const [celebrating, setCelebrating] = useState(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [storageError, setStorageError] = useState(false);
+  const draftFinished = useRef(false);
+  const resumed = useRef(false);
   const [step, setStep] = useState(0);
   // Lazily prefill the name from a previous session (localStorage)
   const [name, setName] = useState(userName);
@@ -99,15 +104,64 @@ export default function OnboardingPage() {
   const [coachError, setCoachError] = useState("");
   const [coachFinished, setCoachFinished] = useState(false);
 
-  // Already onboarded users shouldn't repeat the wizard — but don't yank
-  // them away while the AI coach phase is running (it persists onboarding).
+  // Restore before saving: keyed auth providers remount this entire wizard.
   useEffect(() => {
-    if (hydrated && onboarded && phase === "steps") {
-      router.replace("/");
+    if (!isLoaded || !hydrated || !coursesHydrated || draftLoaded) return;
+    const draft = readOnboardingDraft(allCourses.map((c) => c.id), user?.id ?? null);
+    if (draft) {
+      /* eslint-disable react-hooks/set-state-in-effect -- restore the tab's questionnaire after hydration */
+      setName(draft.name);
+      setInterests(draft.interests);
+      setReason(draft.reason);
+      setKnowledgeLevel(draft.knowledgeLevel);
+      setLearningExp(draft.learningExp);
+      setDailyGoal(draft.dailyGoalMinutes);
+      setFocusEnemy(draft.focusEnemy);
+      setWorkType(draft.workType);
+      setMemory(draft.memory);
+      setLearningStyle(draft.learningStyle);
+      setGraspMethod(draft.graspMethod);
+      setAmbition(draft.ambition);
+      setStep(draft.step);
+      setReady(draft.ready);
+    } else {
+      setName((userName || user?.name || "").slice(0, 40));
+      setCelebrating(!!user && new URLSearchParams(window.location.search).get("welcome") === "1");
     }
-  }, [hydrated, onboarded, router, phase]);
+    setDraftLoaded(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [isLoaded, hydrated, coursesHydrated, draftLoaded, allCourses, user, userName]);
 
-  if (!hydrated || (onboarded && phase === "steps")) {
+  const draft: OnboardingDraft = {
+    version: 1, ownerId: user?.id ?? null, step, ready, name, interests, reason,
+    knowledgeLevel, learningExp, dailyGoalMinutes: dailyGoal, focusEnemy,
+    workType, memory, learningStyle, graspMethod, ambition,
+  };
+  const saveDraft = useEffectEvent(() => {
+    if (draftLoaded && !draftFinished.current && !onboarded) {
+      setStorageError(!saveOnboardingDraft(draft, allCourses.map((c) => c.id)));
+    }
+  });
+  useEffect(() => {
+    saveDraft();
+  }, [draftLoaded, step, ready, name, interests, reason, knowledgeLevel, learningExp,
+    dailyGoal, focusEnemy, workType, memory, learningStyle, graspMethod, ambition]);
+
+  const resumeEvaluation = useEffectEvent(() => { void startStyleEvaluation(); });
+  useEffect(() => {
+    if (!draftLoaded || !user || phase !== "steps") return;
+    if (onboarded) {
+      // An existing profile wins; a guest selection is only a destination.
+      draftFinished.current = true;
+      clearOnboardingDraft();
+      router.replace(interests[0] ? `/courses/${encodeURIComponent(interests[0])}` : "/");
+    } else if (ready && !resumed.current) {
+      resumed.current = true;
+      resumeEvaluation();
+    }
+  }, [draftLoaded, user, onboarded, phase, interests, ready, router]);
+
+  if (!isLoaded || !hydrated || !coursesHydrated || !draftLoaded || (onboarded && phase === "steps")) {
     return (
       <div className="flex flex-1 items-center justify-center py-24 text-sm font-bold text-muted">
         {t.common.loading}
@@ -166,6 +220,7 @@ export default function OnboardingPage() {
 
   /** Save onboarding answers (idempotent) */
   const persistOnboarding = () => {
+    if (!user || !hydrated || onboarded) return;
     completeOnboarding({
       name: displayName,
       interests,
@@ -180,6 +235,16 @@ export default function OnboardingPage() {
       graspMethod,
       ambition,
     });
+    draftFinished.current = true;
+    clearOnboardingDraft();
+  };
+
+  const requireLogin = () => {
+    if (user) return false;
+    const saved = saveOnboardingDraft({ ...draft, ready: true }, allCourses.map((c) => c.id));
+    setStorageError(!saved);
+    if (saved) router.push("/login");
+    return true;
   };
 
   /** Final redirect target: course picked by AI, else first interest */
@@ -190,6 +255,7 @@ export default function OnboardingPage() {
 
   /** Skip everything and go straight to learning */
   const goStraightToCourse = () => {
+    if (requireLogin()) return;
     persistOnboarding();
     router.push(`/courses/${targetCourseId()}`);
   };
@@ -197,6 +263,7 @@ export default function OnboardingPage() {
   /* ------------------------- AI coach flow ------------------------- */
 
   async function startEvaluation(extraClarifications: typeof clarifications) {
+    if (requireLogin()) return;
     setPhase("evaluating");
     setCoachError("");
     try {
@@ -206,6 +273,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           stage: "evaluate",
           profile: profilePayload(),
+          locale,
           courses: interests
             .map((id) => getCourseById(id))
             .filter((c): c is Course => !!c)
@@ -248,6 +316,7 @@ export default function OnboardingPage() {
   }
 
   async function submitDiagnostic() {
+    if (requireLogin()) return;
     if (!quiz) return;
     const total = quiz.questions.length;
     const correct = quiz.questions.filter(
@@ -262,6 +331,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           stage: "result",
           profile: profilePayload(),
+          locale,
           courseTitle: quiz.courseTitle,
           correct,
           total,
@@ -307,6 +377,7 @@ export default function OnboardingPage() {
   /** Dipanggil saat user selesai 12 pertanyaan. AI evaluasi gaya belajar
    *  dulu, lalu user lanjut ke quiz diagnostik. */
   async function startStyleEvaluation() {
+    if (requireLogin()) return;
     setPhase("style");
     setCoachError("");
     try {
@@ -316,6 +387,7 @@ export default function OnboardingPage() {
         body: JSON.stringify({
           stage: "style",
           profile: profilePayload(),
+          locale,
           courses: interests
             .map((id) => getCourseById(id))
             .filter((c): c is Course => !!c)
@@ -336,11 +408,14 @@ export default function OnboardingPage() {
   const continueFromStyle = () => startEvaluation([]);
 
   const finish = () => {
+    if (requireLogin()) return;
+    setReady(true);
     // Mulai dengan evaluasi gaya belajar, bukan langsung quiz.
     startStyleEvaluation();
   };
 
   const finishToCourse = () => {
+    if (requireLogin()) return;
     if (!coachFinished) persistOnboarding();
     router.push(`/courses/${targetCourseId(quiz?.courseId)}`);
   };
@@ -961,11 +1036,15 @@ export default function OnboardingPage() {
                 <Button
                   type="button"
                   variant="outline"
+                  disabled={!user}
                   onClick={() => setAiOpen(true)}
                 >
                   <Sparkles className="h-4 w-4 text-accent-2" />
                   {ob.aiCtaButton}
                 </Button>
+                {!user && <p className="text-center text-xs text-muted">
+                  {locale === "en" ? "Choose a course now. AI course creation unlocks after login." : "Pilih kursus dulu. Pembuatan kursus AI tersedia setelah login."}
+                </p>}
               </div>
             </OnboardingStep>
           )}
@@ -1249,6 +1328,12 @@ export default function OnboardingPage() {
       </div>
 
       {/* ===== Bottom navigation ===== */}
+      {storageError && <p role="alert" className="mb-4 text-sm text-error">
+        {locale === "en" ? "Your answers could not be saved. Enable session storage before continuing to login." : "Jawaban belum tersimpan. Aktifkan penyimpanan sesi browser sebelum melanjutkan ke login."}
+      </p>}
+      {!user && step === TOTAL_STEPS - 1 && <p className="mb-4 text-center text-sm text-muted">
+        {locale === "en" ? "Log in or create an account to save your path and start learning. AI evaluation begins only after login." : "Login atau buat akun untuk menyimpan jalurmu dan mulai belajar. Evaluasi AI dimulai setelah login."}
+      </p>}
       <div className="flex items-center justify-between gap-3 border-t border-border pt-5">
         <Button
           variant="ghost"
@@ -1260,14 +1345,14 @@ export default function OnboardingPage() {
           {t.common.back}
         </Button>
         <Button size="lg" onClick={next} disabled={!canContinue}>
-          {step === TOTAL_STEPS - 1 ? ob.start : t.common.next}
+          {step === TOTAL_STEPS - 1 ? (!user ? (locale === "en" ? "Log in to continue" : "Login untuk lanjut") : ob.start) : t.common.next}
           <ArrowRight className="h-5 w-5" />
         </Button>
       </div>
 
       {/* ===== AI course dialog ===== */}
       <AICourseDialog
-        open={aiOpen}
+        open={!!user && aiOpen}
         onClose={() => setAiOpen(false)}
         onCreated={(course) => {
           addCourse(course);
@@ -1290,7 +1375,7 @@ export default function OnboardingPage() {
       />
 
       {/* Welcome animation shown before the wizard (post-signup) */}
-      {celebrating && (
+      {user && celebrating && (
         <SignUpSuccess
           name={user?.name}
           onContinue={() => setCelebrating(false)}

@@ -6,6 +6,16 @@ import type { Course, CourseModule } from "@/data/types";
  * (imported by the /api/generate-course route handler).
  */
 
+/** Locale the generated content should be written in. */
+export type AiLocale = "id" | "en";
+
+/** Prompt instruction for the output language. */
+function langRule(locale: AiLocale): string {
+  return locale === "en"
+    ? "Write everything in English."
+    : "Write everything in Indonesian (Bahasa Indonesia).";
+}
+
 export interface GeneratedCourseJSON {
   title: string;
   description: string;
@@ -63,16 +73,35 @@ export const REASON_LABELS: Record<string, string> = {
   school: "untuk menunjang sekolah / kuliah",
 };
 
+export const REASON_LABELS_EN: Record<string, string> = {
+  career: "for their career / finding a job",
+  business: "to start their own business",
+  hobby: "as a hobby and for self-improvement",
+  school: "to support their school / college studies",
+};
+
 export const KNOWLEDGE_LABELS: Record<string, string> = {
   beginner: "benar-benar mulai dari nol",
   some: "sudah tahu sedikit-sedikit",
   comfortable: "sudah paham dasar-dasarnya",
 };
 
+export const KNOWLEDGE_LABELS_EN: Record<string, string> = {
+  beginner: "starting completely from zero",
+  some: "already knows a little",
+  comfortable: "already understands the basics",
+};
+
 export const LEARNING_EXP_LABELS: Record<string, string> = {
   self: "terbiasa belajar mandiri (otodidak)",
   course: "pernah mengikuti kursus / pelatihan",
   first: "ini pengalaman belajar pertamanya",
+};
+
+export const LEARNING_EXP_LABELS_EN: Record<string, string> = {
+  self: "used to self-directed learning",
+  course: "has taken courses / training before",
+  first: "this is their first learning experience",
 };
 
 export const FOCUS_ENEMY_LABELS: Record<string, string> = {
@@ -82,6 +111,13 @@ export const FOCUS_ENEMY_LABELS: Record<string, string> = {
   tired: "mudah lelah / ngantuk",
 };
 
+export const FOCUS_ENEMY_LABELS_EN: Record<string, string> = {
+  phone: "phone & social media",
+  people: "people around them",
+  boredom: "gets bored quickly",
+  tired: "gets tired / sleepy easily",
+};
+
 export const GRASP_METHOD_LABELS: Record<string, string> = {
   example: "melihat contoh nyata dulu",
   visual: "gambar / diagram / video",
@@ -89,72 +125,128 @@ export const GRASP_METHOD_LABELS: Record<string, string> = {
   try: "langsung mencoba sendiri",
 };
 
+export const GRASP_METHOD_LABELS_EN: Record<string, string> = {
+  example: "seeing real examples first",
+  visual: "images / diagrams / videos",
+  analogy: "explanations using analogies",
+  try: "trying it hands-on right away",
+};
+
 /** Describe a 0-100 slider value leaning left/right. */
 function sliderLabel(
   value: number | undefined,
   leftLabel: string,
-  rightLabel: string
+  rightLabel: string,
+  locale: AiLocale = "id"
 ): string | null {
   if (typeof value !== "number" || Number.isNaN(value)) return null;
   if (value <= 25) return leftLabel;
   if (value >= 75) return rightLabel;
-  return `seimbang antara ${leftLabel} dan ${rightLabel}`;
+  return locale === "en"
+    ? `balanced between ${leftLabel} and ${rightLabel}`
+    : `seimbang antara ${leftLabel} dan ${rightLabel}`;
 }
 
-/** Human-readable Indonesian lines describing the onboarding profile. */
-export function describeProfile(profile?: CourseProfile): string[] {
+/** Human-readable lines describing the onboarding profile. */
+export function describeProfile(
+  profile?: CourseProfile,
+  locale: AiLocale = "id"
+): string[] {
+  const en = locale === "en";
+  const reasonLabels = en ? REASON_LABELS_EN : REASON_LABELS;
+  const knowledgeLabels = en ? KNOWLEDGE_LABELS_EN : KNOWLEDGE_LABELS;
+  const expLabels = en ? LEARNING_EXP_LABELS_EN : LEARNING_EXP_LABELS;
+  const focusLabels = en ? FOCUS_ENEMY_LABELS_EN : FOCUS_ENEMY_LABELS;
+  const graspLabels = en ? GRASP_METHOD_LABELS_EN : GRASP_METHOD_LABELS;
+
   const lines: string[] = [];
   if (profile?.name) {
-    lines.push(`- Nama: ${profile.name}`);
+    lines.push(en ? `- Name: ${profile.name}` : `- Nama: ${profile.name}`);
   }
-  if (profile?.reason && REASON_LABELS[profile.reason]) {
-    lines.push(`- Tujuan belajar: ${REASON_LABELS[profile.reason]}`);
+  if (profile?.reason && reasonLabels[profile.reason]) {
+    lines.push(
+      en
+        ? `- Learning goal: ${reasonLabels[profile.reason]}`
+        : `- Tujuan belajar: ${reasonLabels[profile.reason]}`
+    );
   }
-  if (profile?.knowledgeLevel && KNOWLEDGE_LABELS[profile.knowledgeLevel]) {
-    lines.push(`- Pengetahuan saat ini: ${KNOWLEDGE_LABELS[profile.knowledgeLevel]}`);
+  if (profile?.knowledgeLevel && knowledgeLabels[profile.knowledgeLevel]) {
+    lines.push(
+      en
+        ? `- Current knowledge: ${knowledgeLabels[profile.knowledgeLevel]}`
+        : `- Pengetahuan saat ini: ${knowledgeLabels[profile.knowledgeLevel]}`
+    );
   }
-  if (profile?.learningExp && LEARNING_EXP_LABELS[profile.learningExp]) {
-    lines.push(`- Pengalaman belajar: ${LEARNING_EXP_LABELS[profile.learningExp]}`);
+  if (profile?.learningExp && expLabels[profile.learningExp]) {
+    lines.push(
+      en
+        ? `- Learning experience: ${expLabels[profile.learningExp]}`
+        : `- Pengalaman belajar: ${expLabels[profile.learningExp]}`
+    );
   }
   if (profile?.dailyGoalMinutes) {
-    lines.push(`- Waktu belajar per hari: sekitar ${profile.dailyGoalMinutes} menit`);
+    lines.push(
+      en
+        ? `- Study time per day: about ${profile.dailyGoalMinutes} minutes`
+        : `- Waktu belajar per hari: sekitar ${profile.dailyGoalMinutes} menit`
+    );
   }
-  if (profile?.focusEnemy && FOCUS_ENEMY_LABELS[profile.focusEnemy]) {
-    lines.push(`- Gangguan fokus utama: ${FOCUS_ENEMY_LABELS[profile.focusEnemy]}`);
+  if (profile?.focusEnemy && focusLabels[profile.focusEnemy]) {
+    lines.push(
+      en
+        ? `- Main focus distraction: ${focusLabels[profile.focusEnemy]}`
+        : `- Gangguan fokus utama: ${focusLabels[profile.focusEnemy]}`
+    );
   }
   const work = sliderLabel(
     profile?.workType,
-    "mengutamakan kecepatan",
-    "mengutamakan ketelitian"
+    en ? "prioritizes speed" : "mengutamakan kecepatan",
+    en ? "prioritizes accuracy" : "mengutamakan ketelitian",
+    locale
   );
-  if (work) lines.push(`- Gaya bekerja: ${work}`);
+  if (work) lines.push(en ? `- Working style: ${work}` : `- Gaya bekerja: ${work}`);
   const mem = sliderLabel(
     profile?.memory,
-    "cepat lupa detail & fakta",
-    "susah memahami konsep besar"
+    en ? "quickly forgets details & facts" : "cepat lupa detail & fakta",
+    en ? "struggles with big concepts" : "susah memahami konsep besar",
+    locale
   );
-  if (mem) lines.push(`- Kelemahan memori: ${mem}`);
+  if (mem) lines.push(en ? `- Memory weakness: ${mem}` : `- Kelemahan memori: ${mem}`);
   const style = sliderLabel(
     profile?.learningStyle,
-    "suka teori dulu sebelum praktik",
-    "suka langsung praktik"
+    en ? "likes theory before practice" : "suka teori dulu sebelum praktik",
+    en ? "likes jumping straight into practice" : "suka langsung praktik",
+    locale
   );
-  if (style) lines.push(`- Gaya belajar: ${style}`);
-  if (profile?.graspMethod && GRASP_METHOD_LABELS[profile.graspMethod]) {
+  if (style) lines.push(en ? `- Learning style: ${style}` : `- Gaya belajar: ${style}`);
+  if (profile?.graspMethod && graspLabels[profile.graspMethod]) {
     lines.push(
-      `- Cara tercepat paham materi rumit: ${GRASP_METHOD_LABELS[profile.graspMethod]}`
+      en
+        ? `- Fastest way to grasp complex material: ${graspLabels[profile.graspMethod]}`
+        : `- Cara tercepat paham materi rumit: ${graspLabels[profile.graspMethod]}`
     );
   }
   if (typeof profile?.ambition === "number" && profile.ambition >= 1) {
-    const level =
-      profile.ambition <= 3
+    const level = en
+      ? profile.ambition <= 3
+        ? "relaxed"
+        : profile.ambition <= 6
+          ? "moderate"
+          : profile.ambition <= 8
+            ? "ambitious"
+            : "very ambitious"
+      : profile.ambition <= 3
         ? "santai"
         : profile.ambition <= 6
           ? "menengah"
           : profile.ambition <= 8
             ? "ambisius"
             : "sangat ambisius";
-    lines.push(`- Tingkat ambisi: ${profile.ambition}/10 (${level})`);
+    lines.push(
+      en
+        ? `- Ambition level: ${profile.ambition}/10 (${level})`
+        : `- Tingkat ambisi: ${profile.ambition}/10 (${level})`
+    );
   }
   return lines;
 }
@@ -162,9 +254,10 @@ export function describeProfile(profile?: CourseProfile): string[] {
 export function buildPrompt(
   skill: string,
   profile?: CourseProfile,
-  pdf?: PdfReferenceInput
+  pdf?: PdfReferenceInput,
+  locale: AiLocale = "id"
 ): string {
-  const lines = describeProfile(profile);
+  const lines = describeProfile(profile, locale);
   const pdfText = pdf?.text ?? "";
   const hasPdfText = pdfText.trim().length > 0;
 
@@ -236,7 +329,7 @@ Return ONLY a valid JSON object (no markdown, no code fences, no commentary) wit
   "longDescription": "2-3 sentences about what the learner will achieve",
   "difficulty": "beginner" | "intermediate" | "advanced",
   "salary": "estimated monthly earning range, e.g. Rp 3-8 jt/month",
-  "demand": "one word: Tinggi or Sangat Tinggi",
+  "demand": "${locale === "en" ? "one word: High or Very High" : "one word: Tinggi or Sangat Tinggi"}",
   "modules": [
     {
       "title": "module title",
@@ -244,7 +337,7 @@ Return ONLY a valid JSON object (no markdown, no code fences, no commentary) wit
         {
           "title": "lesson title",
           "duration": 5,
-          "body": "lesson content in Markdown: start with a short intro paragraph, then use ## headings with an empty line before each one, use '- ' bullet lists, **bold** for key terms, and end with a '## Latihan Praktis' section. 250-400 words."
+          "body": "lesson content in Markdown: start with a short intro paragraph, then use ## headings with an empty line before each one, use '- ' bullet lists, **bold** for key terms, and end with a '## ${locale === "en" ? "Practical Exercise" : "Latihan Praktis"}' section. 250-400 words."
         }
       ]
     }
@@ -260,7 +353,7 @@ Return ONLY a valid JSON object (no markdown, no code fences, no commentary) wit
 }
 
 Rules:
-- Write everything in Indonesian (Bahasa Indonesia).
+- ${langRule(locale)}
 - Exactly 3 modules, each with exactly 3 lessons (9 lessons total).
 - Lesson duration between 4 and 8 (integer minutes).${structureRule}
 - Exactly 5 quiz questions covering all modules.
@@ -414,8 +507,10 @@ export function sanitizeCourse(
  *   3. final    — the end-of-course quiz (1 call)
  * =========================================================================== */
 
-const MIN_OUTLINE_MODULES = 6; // below this the AI clearly failed (target is 12-15)
-const MAX_OUTLINE_MODULES = 15;
+const TARGET_CHAPTERS = 12; // every course: exactly 12 phases
+const LESSONS_PER_PHASE = 3; // each phase: 3 material slides, then a quiz
+const MIN_OUTLINE_MODULES = 6; // below this the AI clearly failed
+const MAX_OUTLINE_MODULES = 15; // sanitized outlines are padded/sliced to 12
 const MAX_CHAPTER_QUIZ = 3;
 
 export interface CourseOutline {
@@ -452,9 +547,10 @@ export interface ModuleDraft {
 export function buildOutlinePrompt(
   skill: string,
   profile?: CourseProfile,
-  pdf?: PdfReferenceInput
+  pdf?: PdfReferenceInput,
+  locale: AiLocale = "id"
 ): string {
-  const lines = describeProfile(profile);
+  const lines = describeProfile(profile, locale);
   const profileBlock =
     lines.length > 0 ? `\nLearner profile:\n${lines.join("\n")}\n` : "";
   const pdfText = pdf?.text ?? "";
@@ -468,11 +564,11 @@ export function buildOutlinePrompt(
 Design the STRUCTURE ONLY of a complete mini course ${topicIntro}.
 ${profileBlock}
 Structure requirements:
-- 12 to 15 modules (chapters), ordered from fundamentals to advanced practice${hasPdfText ? ", following the attached reference material's own section order" : ""}.
-- Each module contains exactly 1 or 2 short lessons.
+- EXACTLY ${TARGET_CHAPTERS} modules (phases), ordered from fundamentals to advanced practice${hasPdfText ? ", following the attached reference material's own section order" : ""}. The difficulty MUST rise steadily from phase 1 (easiest) to phase 12 (most advanced).
+- Each module contains EXACTLY ${LESSONS_PER_PHASE} lessons (3 material slides that build on each other, then a phase quiz is taken by the learner).
 ${
   hasPdfText
-    ? `- The chapters MUST map onto what the attached material actually contains, in its original order. Do NOT invent topics absent from it; if it has fewer than 12 distinct topics, split large ones across several chapters and go deeper instead.
+    ? `- The phases MUST map onto what the attached material actually contains, in its original order. Do NOT invent topics absent from it; if it has fewer than 12 distinct topics, split large ones across several phases and go deeper instead.
 `
     : ""
 }
@@ -483,7 +579,7 @@ Return ONLY a valid JSON object (no markdown, no code fences):
   "longDescription": "2-3 sentences about what the learner will achieve",
   "difficulty": "beginner" | "intermediate" | "advanced",
   "salary": "estimated monthly earning range, e.g. Rp 3-8 jt/month",
-  "demand": "one word: Tinggi or Sangat Tinggi",
+  "demand": "${locale === "en" ? "one word: High or Very High" : "one word: Tinggi or Sangat Tinggi"}",
   "modules": [
     {
       "title": "chapter title",
@@ -494,8 +590,8 @@ Return ONLY a valid JSON object (no markdown, no code fences):
 }
 
 Rules:
-- Write everything in Indonesian (Bahasa Indonesia), plain text only.
-- Exactly 12-15 items in "modules", each with 1-2 lessons.${
+- ${langRule(locale)} Plain text only.
+- Exactly ${TARGET_CHAPTERS} items in "modules", each with exactly ${LESSONS_PER_PHASE} lesson titles (concept -> deeper -> practice, in that order).${
     pdf && !hasPdfText
       ? `
 NOTE: a reference PDF ("${pdf?.name}") was uploaded but no readable text could be extracted from it. Design the best possible structure about "${skill}" from your own knowledge.`
@@ -510,8 +606,10 @@ export function buildModuleContentPrompt(params: {
   allChapterTitles: string[];
   profile?: CourseProfile;
   pdf?: PdfReferenceInput;
+  locale?: AiLocale;
 }): string {
-  const lines = describeProfile(params.profile);
+  const locale: AiLocale = params.locale === "en" ? "en" : "id";
+  const lines = describeProfile(params.profile, locale);
   const profileBlock =
     lines.length > 0 ? `\nLearner profile:\n${lines.join("\n")}\n` : "";
   const pdfText = params.pdf?.text ?? "";
@@ -538,7 +636,7 @@ WRITE CONTENT FOR THESE CHAPTERS ONLY:
 ${chapterList}
 ${profileBlock}
 For EVERY listed chapter produce:
-1. Its lessons in the given order. Each lesson body is Markdown, 150-300 words: a short intro paragraph, then ## headings, '- ' bullet lists, **bold** key terms, ending with a '## Latihan Praktis' section. Duration 4-8 minutes.
+1. Its EXACTLY ${LESSONS_PER_PHASE} lessons in the given order (3 material slides that build on each other: concept -> deeper -> practice). Each lesson body is Markdown, 150-300 words: a short intro paragraph, then ## headings, '- ' bullet lists, **bold** key terms, ending with a '## ${locale === "en" ? "Practical Exercise" : "Latihan Praktis"}' section. Duration 4-8 minutes.
 2. A chapter quiz with EXACTLY ${MAX_CHAPTER_QUIZ} questions. Each question has exactly 4 options and one correct answer (correctIndex 0-3, must vary), plus a one-sentence explanation.
 ${
   hasPdfText
@@ -550,7 +648,7 @@ Return ONLY a valid JSON object:
 
 Rules:
 - The "modules" array MUST contain exactly ${params.chapters.length} items in the same order as the chapters above.
-- Write everything in Indonesian (Bahasa Indonesia). Titles plain text; Markdown allowed ONLY inside lesson "body".
+- ${langRule(locale)} Titles plain text; Markdown allowed ONLY inside lesson "body".
 - No videos, no external links, no placeholders.${
     hasPdfText
       ? `\n\nREFERENCE MATERIAL:\n--- PDF CONTENT START ---\n${pdfText}\n--- PDF CONTENT END ---`
@@ -562,7 +660,9 @@ export function buildFinalQuizPrompt(params: {
   courseTitle: string;
   chapters: { title: string; summary: string }[];
   pdf?: PdfReferenceInput;
+  locale?: AiLocale;
 }): string {
+  const locale: AiLocale = params.locale === "en" ? "en" : "id";
   const pdfText = params.pdf?.text ?? "";
   const hasPdfText = pdfText.trim().length > 0;
   const contextList = params.chapters
@@ -584,7 +684,7 @@ Return ONLY a valid JSON object:
 { "quiz": [ { "question": "...", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "..." } ] }
 
 Rules:
-- Write everything in Indonesian (Bahasa Indonesia), plain text only.${
+- ${langRule(locale)} Plain text only.${
     hasPdfText
       ? `\n\nREFERENCE MATERIAL:\n--- PDF CONTENT START ---\n${pdfText}\n--- PDF CONTENT END ---`
       : ""
@@ -613,7 +713,8 @@ export function sanitizeOutline(raw: unknown): CourseOutline {
         )
         .map((t) => t.trim())
         .filter(Boolean)
-        .slice(0, 2);
+        // Three material slides per phase (concept -> deeper -> practice).
+        .slice(0, LESSONS_PER_PHASE);
       return {
         title: loc(String(mo.title ?? "")).id.trim(),
         summary: loc(String(mo.summary ?? "")).id.trim(),
@@ -626,6 +727,38 @@ export function sanitizeOutline(raw: unknown): CourseOutline {
     throw new Error(
       `ai_outline_too_small (${modules.length} modules, need ${MIN_OUTLINE_MODULES})`
     );
+  }
+
+  // Guarantee EXACTLY 12 phases, each with exactly 3 lesson titles:
+  // pad with deeper-dive follow-ups when the AI returned fewer, slice when
+  // it returned more.
+  while (modules.length < TARGET_CHAPTERS) {
+    const n = modules.length + 1;
+    const last = modules[modules.length - 1];
+    const base = last.lessonTitles[0] || last.title;
+    modules.push({
+      title: `Pendalaman ${last.title}`,
+      summary: `Pendalaman lanjutan dari materi ${last.title}.`,
+      lessonTitles: [
+        `${base} — bagian ${n}`,
+        `Pendalaman ${base} — bagian ${n}`,
+        `Praktik ${base} — bagian ${n}`,
+      ],
+    });
+  }
+  if (modules.length > TARGET_CHAPTERS) {
+    modules.length = TARGET_CHAPTERS;
+  }
+  // Ensure every phase has exactly 3 lesson titles.
+  for (const m of modules) {
+    const base = m.lessonTitles[0] || m.title;
+    while (m.lessonTitles.length < LESSONS_PER_PHASE) {
+      const k = m.lessonTitles.length;
+      m.lessonTitles.push(
+        k === 1 ? `Pendalaman ${base}` : `Praktik ${base}`
+      );
+    }
+    m.lessonTitles = m.lessonTitles.slice(0, LESSONS_PER_PHASE);
   }
 
   const difficultyRaw = String(o.difficulty ?? "");
@@ -685,7 +818,7 @@ export function sanitizeModuleBatch(
     const fallbackTitles = outlineChapters[i]?.lessonTitles ?? [];
 
     const lessons = (Array.isArray(mo.lessons) ? mo.lessons : [])
-      .slice(0, 3)
+      .slice(0, LESSONS_PER_PHASE) // three material slides per phase
       .map((l, li): { title: string; duration: number; body: string } | null => {
         const lo = asObject(l);
         const body = String(lo.body ?? "").trim();

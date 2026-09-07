@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
   ArrowRight,
@@ -10,13 +10,18 @@ import {
   ChevronDown,
   ChevronRight,
   Clock,
+  Flame,
+  Gamepad2,
+  Hand,
   Home,
   Layers,
   Loader2,
+  MousePointerClick,
   NotebookPen,
   RefreshCw,
   Send,
   Sparkles,
+  Target,
   Trophy,
   X,
   XCircle,
@@ -99,7 +104,7 @@ async function callAssistant(body: Record<string, unknown>) {
   return res.json();
 }
 
-type ToolId = "home" | "notes" | "flashcards" | "quiz" | "ai" | "mindmap";
+type ToolId = "home" | "notes" | "flashcards" | "quiz" | "game" | "ai" | "mindmap";
 
 /* ------------------------------ component ----------------------------- */
 
@@ -121,6 +126,7 @@ export function CourseToolsSidebar({
     { id: "notes", label: t.studyTools.notes, icon: NotebookPen },
     { id: "flashcards", label: t.studyTools.flashcards, icon: Layers },
     { id: "quiz", label: t.studyTools.quiz, icon: Trophy },
+    { id: "game", label: t.studyTools.game, icon: Gamepad2 },
     { id: "ai", label: t.studyTools.ai, icon: Sparkles },
     { id: "mindmap", label: t.studyTools.mindmap, icon: Brain },
   ];
@@ -171,7 +177,8 @@ export function CourseToolsSidebar({
               }}
               title={label}
               className={cn(
-                "flex items-center gap-3 rounded-2xl px-3.5 py-3 text-sm font-bold transition-colors",
+                "flex items-center gap-3 rounded-2xl py-3 text-sm font-bold transition-colors",
+                collapsed ? "justify-center px-0" : "px-3.5",
                 active === id
                   ? "bg-gradient-to-r from-primary to-deep-orange text-white"
                   : "text-muted hover:bg-background hover:text-foreground",
@@ -204,6 +211,7 @@ export function CourseToolsSidebar({
               )}
               {active === "flashcards" && <FlashcardsTool course={course} />}
               {active === "quiz" && <QuizTool course={course} />}
+              {active === "game" && <GameQuizTool course={course} />}
               {active === "ai" && (
                 <AiTool course={course} completedLessons={completedLessons} />
               )}
@@ -858,22 +866,54 @@ function FlashcardsTool({ course }: { course: Course }) {
         </button>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setFlipped((v) => !v)}
-        aria-label={t.studyTools.flashcardFlip}
-        className="mt-4 flex min-h-48 w-full flex-col items-center justify-center rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-gold/10 p-6 text-center transition-transform hover:scale-[1.01]"
-      >
-        <span className="text-xs font-bold uppercase tracking-wider text-primary">
-          {flipped ? t.studyTools.flashcardBack : t.studyTools.flashcardFront}
-        </span>
-        <span className="mt-3 text-lg font-bold">
-          {flipped ? current.back : current.front}
-        </span>
-        <span className="mt-3 text-xs font-semibold text-muted">
-          {t.studyTools.flashcardFlip} · {index + 1}/{cards.length}
-        </span>
-      </button>
+      <div className="mt-4 [perspective:1200px]">
+        <motion.button
+          type="button"
+          key={index}
+          initial={{ opacity: 0, x: 40, scale: 0.96 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 26 }}
+          onClick={() => setFlipped((v) => !v)}
+          aria-label={t.studyTools.flashcardFlip}
+          className="relative h-52 w-full cursor-pointer [transform-style:preserve-3d]"
+          whileHover={{ scale: 1.015 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <motion.div
+            className="relative h-full w-full [transform-style:preserve-3d]"
+            animate={{ rotateY: flipped ? 180 : 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+          >
+            {/* Front face */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-gold/10 p-6 text-center [backface-visibility:hidden]">
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                {t.studyTools.flashcardFront}
+              </span>
+              <span className="mt-3 text-lg font-bold leading-snug">
+                {current.front}
+              </span>
+              <span className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted">
+                <RefreshCw className="h-3 w-3" />
+                {t.studyTools.flashcardFlip} · {index + 1}/{cards.length}
+              </span>
+            </div>
+
+            {/* Back face */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border-2 border-success/40 bg-gradient-to-br from-success/10 to-primary/10 p-6 text-center [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <span className="text-xs font-bold uppercase tracking-wider text-success">
+                {t.studyTools.flashcardBack}
+              </span>
+              <span className="mt-3 text-lg font-bold leading-snug">
+                {current.back}
+              </span>
+              <span className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted">
+                <RefreshCw className="h-3 w-3" />
+                {t.studyTools.flashcardFlip} · {index + 1}/{cards.length}
+              </span>
+            </div>
+          </motion.div>
+        </motion.button>
+      </div>
 
       <div className="mt-3 flex items-center justify-between">
         <button
@@ -898,6 +938,610 @@ function FlashcardsTool({ course }: { course: Course }) {
           {t.studyTools.flashcardNext}
           <ArrowRight className="h-4 w-4" />
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ----------------------------- Game Quiz ------------------------------ */
+
+type SideGameKind = "swipe" | "tap" | "match";
+
+function GameQuizTool({ course }: { course: Course }) {
+  const { t, locale } = useI18n();
+  const [started, setStarted] = useState(false);
+  const [roundIdx, setRoundIdx] = useState(0);
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [phase, setPhase] = useState<"intro" | "playing" | "feedback">("intro");
+  const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
+  const [finished, setFinished] = useState(false);
+
+  // Use the course's built-in quiz questions
+  const questions = course.quiz;
+
+  const rounds = useMemo(() => {
+    const kinds: SideGameKind[] = ["tap", "swipe", "match"];
+    return questions.map((q, i) => ({
+      kind: kinds[i % kinds.length] as SideGameKind,
+      question: q,
+    }));
+  }, [questions]);
+
+  if (questions.length === 0) {
+    return (
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed border-border bg-background p-10 text-center">
+        <Gamepad2 className="h-8 w-8 text-muted" />
+        <p className="text-sm text-muted">{t.studyTools.gameNoQuiz}</p>
+      </div>
+    );
+  }
+
+  if (!started) {
+    return (
+      <div className="flex flex-col items-center gap-5 rounded-2xl border border-dashed border-border bg-background p-10 text-center">
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 15 }}
+          className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-deep-orange text-white"
+        >
+          <Gamepad2 className="h-8 w-8" />
+        </motion.span>
+        <div>
+          <h3 className="font-display text-lg font-extrabold">
+            {t.studyTools.game}
+          </h3>
+          <p className="mt-1 max-w-sm text-sm text-muted">
+            {t.studyTools.gameStartDesc}
+          </p>
+          <p className="mt-2 text-xs font-bold text-muted">
+            {questions.length} {t.studyTools.gameQuestion}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setStarted(true)}
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-deep-orange px-6 py-3 text-sm font-bold text-white shadow-soft transition-transform hover:scale-105"
+        >
+          <Gamepad2 className="h-4 w-4" />
+          {t.studyTools.gameStart}
+        </button>
+      </div>
+    );
+  }
+
+  if (finished) {
+    const pct = Math.round((score / questions.length) * 100);
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex flex-col items-center gap-5 rounded-2xl border border-border bg-background p-10 text-center"
+      >
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", delay: 0.15 }}
+          className={cn(
+            "flex h-16 w-16 items-center justify-center rounded-full text-white",
+            pct >= 70 ? "bg-success" : "bg-error"
+          )}
+        >
+          <Trophy className="h-8 w-8" />
+        </motion.span>
+        <div>
+          <h3 className="font-display text-2xl font-extrabold">
+            {t.studyTools.gameComplete}
+          </h3>
+          <p className="mt-1 text-sm text-muted">
+            {t.studyTools.gameCompleteDesc}
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="font-display text-3xl font-extrabold text-primary">
+              {pct}%
+            </div>
+            <div className="text-xs font-bold text-muted">
+              {t.studyTools.gameScore}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <div className="font-display text-3xl font-extrabold text-muted">
+              {score}/{questions.length}
+            </div>
+            <div className="text-xs font-bold text-muted">
+              {t.studyTools.gameCorrect}
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setStarted(false);
+            setRoundIdx(0);
+            setScore(0);
+            setStreak(0);
+            setPhase("intro");
+            setLastCorrect(null);
+            setFinished(false);
+          }}
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-deep-orange px-6 py-3 text-sm font-bold text-white shadow-soft transition-transform hover:scale-105"
+        >
+          <RefreshCw className="h-4 w-4" />
+          {t.studyTools.gamePlayAgain}
+        </button>
+      </motion.div>
+    );
+  }
+
+  const round = rounds[roundIdx];
+  const totalRounds = rounds.length;
+  const isLast = roundIdx === totalRounds - 1;
+
+  const handleResult = (correct: boolean) => {
+    setLastCorrect(correct);
+    if (correct) {
+      setScore((s) => s + 1);
+      setStreak((s) => s + 1);
+    } else {
+      setStreak(0);
+    }
+    setPhase("feedback");
+  };
+
+  const nextRound = () => {
+    if (isLast) {
+      setFinished(true);
+    } else {
+      setRoundIdx((i) => i + 1);
+      setPhase("intro");
+      setLastCorrect(null);
+    }
+  };
+
+  const gameIcons: Record<SideGameKind, typeof Hand> = {
+    swipe: Hand,
+    tap: MousePointerClick,
+    match: Target,
+  };
+  const gameTitles: Record<SideGameKind, string> = {
+    swipe: t.studyTools.gameSwipe,
+    tap: t.studyTools.gameTap,
+    match: t.studyTools.gameMatch,
+  };
+  const gameHints: Record<SideGameKind, string> = {
+    swipe: t.studyTools.gameSwipeHint,
+    tap: t.studyTools.gameTapHint,
+    match: t.studyTools.gameMatchHint,
+  };
+  const GameIcon = gameIcons[round.kind];
+
+  return (
+    <div>
+      {/* Game header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-extrabold text-primary">
+            <Trophy className="h-3.5 w-3.5" />
+            {t.studyTools.gameScore}: {score}
+          </span>
+          {streak > 1 && (
+            <span className="flex items-center gap-1 rounded-full bg-deep-orange/10 px-3 py-1.5 text-xs font-extrabold text-deep-orange">
+              <Flame className="h-3.5 w-3.5" />
+              {streak}x
+            </span>
+          )}
+        </div>
+        <span className="text-xs font-bold text-muted">
+          {roundIdx + 1}/{totalRounds}
+        </span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="mt-3 flex gap-1">
+        {rounds.map((_, i) => (
+          <span
+            key={i}
+            className={cn(
+              "h-1.5 flex-1 rounded-full transition-colors",
+              i < roundIdx
+                ? "bg-success"
+                : i === roundIdx
+                  ? "bg-primary"
+                  : "bg-border"
+            )}
+          />
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {/* INTRO */}
+        {phase === "intro" && (
+          <IntroPhase
+            key={`intro-${roundIdx}`}
+            roundIdx={roundIdx}
+            totalRounds={totalRounds}
+            GameIcon={GameIcon}
+            title={gameTitles[round.kind]}
+            hint={gameHints[round.kind]}
+            questionText={pick(locale, round.question.question)}
+            onDone={() => setPhase("playing")}
+          />
+        )}
+
+        {/* PLAYING */}
+        {phase === "playing" && (
+          <motion.div
+            key={`play-${roundIdx}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="mt-5"
+          >
+            {round.kind === "swipe" && (
+              <SideSwipeGame question={round.question} onResult={handleResult} />
+            )}
+            {round.kind === "tap" && (
+              <SideTapGame question={round.question} onResult={handleResult} />
+            )}
+            {round.kind === "match" && (
+              <SideMatchGame question={round.question} onResult={handleResult} />
+            )}
+          </motion.div>
+        )}
+
+        {/* FEEDBACK */}
+        {phase === "feedback" && (
+          <motion.div
+            key={`fb-${roundIdx}`}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className={cn(
+              "mt-5 flex flex-col items-center gap-4 rounded-2xl border p-8 text-center",
+              lastCorrect
+                ? "border-success/40 bg-success/5"
+                : "border-error/40 bg-error/5"
+            )}
+          >
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className={cn(
+                "flex h-14 w-14 items-center justify-center rounded-full text-white",
+                lastCorrect ? "bg-success" : "bg-error"
+              )}
+            >
+              {lastCorrect ? (
+                <CheckCircle2 className="h-7 w-7" />
+              ) : (
+                <XCircle className="h-7 w-7" />
+              )}
+            </motion.span>
+            <h3 className="font-display text-xl font-extrabold">
+              {lastCorrect
+                ? t.studyTools.gameCorrect
+                : t.studyTools.gameWrong}
+            </h3>
+            {round.question.explanation && (
+              <p className="max-w-md text-sm leading-relaxed text-muted">
+                {pick(locale, round.question.explanation)}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={nextRound}
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-primary to-deep-orange px-6 py-2.5 text-sm font-bold text-white transition-transform hover:scale-105"
+            >
+              {isLast ? t.studyTools.gameFinish : t.studyTools.gameNext}
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* Intro phase with auto-advance */
+function IntroPhase({
+  roundIdx,
+  totalRounds,
+  GameIcon,
+  title,
+  hint,
+  questionText,
+  onDone,
+}: {
+  roundIdx: number;
+  totalRounds: number;
+  GameIcon: typeof Hand;
+  title: string;
+  hint: string;
+  questionText: string;
+  onDone: () => void;
+}) {
+  useEffect(() => {
+    const id = setTimeout(onDone, 2200);
+    return () => clearTimeout(id);
+  }, [onDone]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
+      className="mt-5 flex flex-col items-center gap-4 rounded-2xl border border-border bg-background p-8 text-center"
+    >
+      <motion.span
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ type: "spring", delay: 0.15 }}
+        className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-deep-orange text-white"
+      >
+        <GameIcon className="h-7 w-7" />
+      </motion.span>
+      <div>
+        <p className="text-[10px] font-bold uppercase tracking-widest text-primary">
+          Game {roundIdx + 1} / {totalRounds}
+        </p>
+        <h3 className="mt-1 font-display text-lg font-extrabold">{title}</h3>
+        <p className="mt-1 text-xs text-muted">{hint}</p>
+      </div>
+      <motion.div
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ repeat: Infinity, duration: 1.5 }}
+        className="rounded-full bg-primary/10 px-4 py-2 text-xs font-bold text-primary"
+      >
+        {questionText}
+      </motion.div>
+    </motion.div>
+  );
+}
+
+/* ---- Swipe: drag right for true, left for false ---- */
+function SideSwipeGame({
+  question,
+  onResult,
+}: {
+  question: Course["quiz"][number];
+  onResult: (correct: boolean) => void;
+}) {
+  const { locale } = useI18n();
+  const committed = useRef(false);
+
+  const correctOpt = question.options[question.correctIndex];
+  const [showCorrect] = useState(() => Math.random() > 0.4);
+  const displayStatement = showCorrect
+    ? pick(locale, correctOpt)
+    : pick(
+        locale,
+        question.options[
+          (question.correctIndex + 1) % question.options.length
+        ]
+      );
+  const isTrueStatement = showCorrect;
+
+  return (
+    <div className="flex flex-col items-center gap-4">
+      <p className="text-sm font-bold text-muted">
+        {pick(locale, question.question)}
+      </p>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.8}
+        onDragEnd={(_, info) => {
+          if (committed.current) return;
+          const threshold = 80;
+          if (info.offset.x > threshold) {
+            committed.current = true;
+            onResult(isTrueStatement);
+          } else if (info.offset.x < -threshold) {
+            committed.current = true;
+            onResult(!isTrueStatement);
+          }
+        }}
+        whileDrag={{ scale: 1.05, rotate: 3 }}
+        className="flex min-h-40 w-full cursor-grab flex-col items-center justify-center rounded-2xl border-2 border-primary/30 bg-gradient-to-br from-primary/10 to-gold/10 p-6 text-center active:cursor-grabbing"
+      >
+        <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+          Pernyataan
+        </span>
+        <span className="mt-2 text-base font-bold leading-snug">
+          {displayStatement}
+        </span>
+      </motion.div>
+      <div className="flex items-center gap-6 text-[10px] font-bold text-muted">
+        <span className="flex items-center gap-1 text-error">
+          <ArrowLeft className="h-3.5 w-3.5" /> SALAH
+        </span>
+        <span className="flex items-center gap-1 text-success">
+          BENAR <ArrowRight className="h-3.5 w-3.5" />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ---- Tap: pick the correct option ---- */
+function SideTapGame({
+  question,
+  onResult,
+}: {
+  question: Course["quiz"][number];
+  onResult: (correct: boolean) => void;
+}) {
+  const { locale } = useI18n();
+  const [picked, setPicked] = useState<number | null>(null);
+  const [checked, setChecked] = useState(false);
+
+  const handlePick = (idx: number) => {
+    if (checked) return;
+    setPicked(idx);
+    setChecked(true);
+    setTimeout(() => onResult(idx === question.correctIndex), 600);
+  };
+
+  return (
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <p className="text-sm font-bold">{pick(locale, question.question)}</p>
+      <div className="mt-4 grid gap-2">
+        {question.options.map((opt, oi) => {
+          const isPicked = picked === oi;
+          const isCorrect = checked && oi === question.correctIndex;
+          const isWrong = checked && isPicked && oi !== question.correctIndex;
+          return (
+            <motion.button
+              key={oi}
+              type="button"
+              onClick={() => handlePick(oi)}
+              whileHover={!checked ? { scale: 1.02 } : undefined}
+              whileTap={!checked ? { scale: 0.97 } : undefined}
+              className={cn(
+                "flex items-center gap-3 rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition-colors",
+                isCorrect
+                  ? "border-success bg-success/10 text-success"
+                  : isWrong
+                    ? "border-error bg-error/10 text-error"
+                    : isPicked
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-card hover:border-primary/40"
+              )}
+            >
+              <span
+                className={cn(
+                  "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-extrabold",
+                  isCorrect
+                    ? "border-success bg-success text-white"
+                    : isWrong
+                      ? "border-error bg-error text-white"
+                      : isPicked
+                        ? "border-primary bg-primary text-white"
+                        : "border-border text-muted"
+                )}
+              >
+                {isCorrect ? (
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                ) : isWrong ? (
+                  <XCircle className="h-3.5 w-3.5" />
+                ) : (
+                  String.fromCharCode(65 + oi)
+                )}
+              </span>
+              {pick(locale, opt)}
+            </motion.button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---- Match: tap question then tap correct answer ---- */
+function SideMatchGame({
+  question,
+  onResult,
+}: {
+  question: Course["quiz"][number];
+  onResult: (correct: boolean) => void;
+}) {
+  const { locale } = useI18n();
+  const [selectedLeft, setSelectedLeft] = useState(false);
+  const [matched, setMatched] = useState(false);
+  const [wrongId, setWrongId] = useState<string | null>(null);
+  const doneRef = useRef(false);
+
+  const correct = pick(locale, question.options[question.correctIndex]);
+  const rightItems = useMemo(() => {
+    const wrongs = question.options
+      .filter((_, i) => i !== question.correctIndex)
+      .slice(0, 2)
+      .map((o) => pick(locale, o));
+    const all = [correct, ...wrongs];
+    for (let i = all.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [all[i], all[j]] = [all[j], all[i]];
+    }
+    return all.map((text, i) => ({
+      id: `a${i}`,
+      text,
+      isCorrect: text === correct,
+    }));
+  }, [question, locale, correct]);
+
+  const handleRight = (id: string) => {
+    if (doneRef.current || !selectedLeft) return;
+    const item = rightItems.find((r) => r.id === id);
+    if (!item) return;
+    if (item.isCorrect) {
+      setMatched(true);
+      doneRef.current = true;
+      setTimeout(() => onResult(true), 800);
+    } else {
+      setWrongId(id);
+      setTimeout(() => {
+        setWrongId(null);
+        setSelectedLeft(false);
+      }, 600);
+    }
+  };
+
+  return (
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-wider text-muted">
+        {matched ? "Cocok!" : "Tap soal lalu tap jawaban"}
+      </p>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* Left */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setSelectedLeft(true)}
+            className={cn(
+              "w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition-colors",
+              selectedLeft
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-border bg-card hover:border-primary/40"
+            )}
+          >
+            {pick(locale, question.question)}
+          </button>
+        </div>
+        {/* Right */}
+        <div className="space-y-2">
+          {rightItems.map((item) => (
+            <motion.button
+              key={item.id}
+              type="button"
+              onClick={() => handleRight(item.id)}
+              animate={
+                wrongId === item.id
+                  ? { x: [0, -8, 8, -4, 4, 0] }
+                  : matched && item.isCorrect
+                    ? { scale: [1, 1.05, 1] }
+                    : {}
+              }
+              transition={{ duration: 0.4 }}
+              className={cn(
+                "w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition-colors",
+                matched && item.isCorrect
+                  ? "border-success bg-success/10 text-success"
+                  : wrongId === item.id
+                    ? "border-error bg-error/10 text-error"
+                    : "border-border bg-card hover:border-primary/40"
+              )}
+            >
+              {item.text}
+            </motion.button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -1277,11 +1921,15 @@ function AiTool({
               className={cn(
                 "max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
                 m.role === "user"
-                  ? "ml-auto bg-gradient-to-r from-primary to-deep-orange text-white"
+                  ? "ml-auto whitespace-pre-wrap bg-gradient-to-r from-primary to-deep-orange text-white"
                   : "border border-border bg-background"
               )}
             >
-              {m.content}
+              {m.role === "assistant" ? (
+                <MarkdownText text={m.content} className="space-y-2 text-sm" />
+              ) : (
+                m.content
+              )}
             </div>
           ))
         )}

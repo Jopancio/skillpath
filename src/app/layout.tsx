@@ -1,10 +1,13 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Plus_Jakarta_Sans, Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { AppShell } from "@/components/layout/AppShell";
+import { PageTransition } from "@/components/layout/PageTransition";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -42,7 +45,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <ClerkProvider>
           <Providers>
           <Navbar />
-          <main className="flex-1 pt-16 lg:pt-20">{children}</main>
+          <main className="flex-1 pt-16 lg:pt-20">
+            <Suspense>
+              <PageTransition>
+                <AppShell>{children}</AppShell>
+              </PageTransition>
+            </Suspense>
+          </main>
           <Footer />
           </Providers>
         </ClerkProvider>

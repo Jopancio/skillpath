@@ -13,7 +13,6 @@ import type { Course } from "@/data/types";
 import { courses as builtinCourses } from "@/data/courses";
 import { useAuth } from "@/lib/auth";
 import {
-  fetchUserData,
   persistUserData,
   supabase,
 } from "@/lib/supabase";
@@ -59,7 +58,8 @@ function CustomCoursesInner({
   storageKey: string | null;
 }) {
   const [customCourses, setCustomCourses] = useState<Course[]>([]);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(!storageKey);
+  const [hydrationFailed, setHydrationFailed] = useState(false);
   const { getToken } = useAuth();
 
   // Load once on mount (intentional hydration from localStorage)
@@ -78,18 +78,24 @@ function CustomCoursesInner({
     } catch {
       // corrupted storage -> start fresh
     }
-    setHydrated(true);
-    // Prefer the DB copy when it exists (fresher than the local cache).
-    if (userId && supabase) {
-      void fetchUserData<Course[]>("custom_courses", userId, getToken).then(
-        (remote) => {
-          if (cancelled || !Array.isArray(remote)) return;
-          const clean = remote.filter((c) => c && c.id).slice(0, MAX_CUSTOM);
-          setCustomCourses(clean);
-          window.localStorage.setItem(storageKey, JSON.stringify(clean));
+    void (async () => {
+      try {
+        if (userId && supabase) {
+          const token = await getToken();
+          if (!token) throw new Error("Missing session token");
+          const { data } = await supabase.from("custom_courses").select("data")
+            .eq("user_id", userId).setHeader("Authorization", `Bearer ${token}`)
+            .abortSignal(AbortSignal.timeout(15000)).maybeSingle().throwOnError();
+          if (cancelled) return;
+          if (Array.isArray(data?.data)) {
+            setCustomCourses(data.data.filter((c: Course) => c && c.id).slice(0, MAX_CUSTOM));
+          }
         }
-      );
-    }
+        if (!cancelled) setHydrated(true);
+      } catch {
+        if (!cancelled) setHydrationFailed(true);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -146,6 +152,13 @@ function CustomCoursesInner({
     }),
     [customCourses, allCourses, hydrated, addCourse, removeCourse, getCourseById]
   );
+
+  if (hydrationFailed) {
+    return <div role="alert" className="p-8 text-center">
+      <p>Data kursus gagal dimuat. / Could not load course data.</p>
+      <button type="button" onClick={() => window.location.reload()}>Coba lagi / Retry</button>
+    </div>;
+  }
 
   return (
     <CustomCoursesContext.Provider value={value}>

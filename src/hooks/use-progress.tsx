@@ -13,7 +13,6 @@ import {
 import { daysBetween, todayKey, xpProgress } from "@/lib/utils";
 import { useAuth } from "@/lib/auth";
 import {
-  fetchUserData,
   persistUserData,
   supabase,
   upsertLeaderboardEntry,
@@ -152,7 +151,8 @@ function ProgressInner({
   storageKey: string | null;
 }) {
   const [state, setState] = useState<PersistedState>(initialState);
-  const [hydrated, setHydrated] = useState(false);
+  const [hydrated, setHydrated] = useState(!storageKey);
+  const [hydrationFailed, setHydrationFailed] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { user, getToken } = useAuth();
 
@@ -187,18 +187,24 @@ function ProgressInner({
     } catch {
       // corrupted storage -> start fresh
     }
-    setHydrated(true);
-    // Prefer the DB copy when it exists (fresher than the local cache).
-    if (userId && supabase) {
-      void fetchUserData<PersistedState>("progress", userId, getToken).then(
-        (remote) => {
-          if (cancelled || !remote) return;
-          const migrated = migrateState(remote);
-          setState(migrated);
-          window.localStorage.setItem(storageKey, JSON.stringify(migrated));
+    // Do not expose writable defaults until the account's remote copy is known.
+    void (async () => {
+      try {
+        if (userId && supabase) {
+          const token = await getToken();
+          if (!token) throw new Error("Missing session token");
+          const { data } = await supabase.from("progress").select("data")
+            .eq("user_id", userId).setHeader("Authorization", `Bearer ${token}`)
+            .abortSignal(AbortSignal.timeout(15000)).maybeSingle().throwOnError();
+          if (cancelled) return;
+          if (data?.data) setState(migrateState(data.data as PersistedState));
         }
-      );
-    }
+        if (!cancelled) setHydrated(true);
+      } catch {
+        // A failed read is not an empty account. Never upload defaults over it.
+        if (!cancelled) setHydrationFailed(true);
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -210,7 +216,11 @@ function ProgressInner({
     if (!hydrated || !storageKey) return;
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
-      window.localStorage.setItem(storageKey, JSON.stringify(state));
+      try {
+        window.localStorage.setItem(storageKey, JSON.stringify(state));
+      } catch {
+        // Remote persistence still works when local storage is unavailable.
+      }
       if (userId && supabase) {
         void persistUserData("progress", userId, state, getToken);
         // Publish the stats that power the dashboard leaderboard.
@@ -314,7 +324,9 @@ function ProgressInner({
 
   const completeOnboarding = useCallback(
     (data: OnboardingData & { name?: string }) => {
+      if (!hydrated || !userId) return;
       setState((s) => {
+        if (s.onboarded) return s;
         const next: PersistedState = {
           ...s,
           onboarded: true,
@@ -337,7 +349,7 @@ function ProgressInner({
         return touchStreak(next);
       });
     },
-    [touchStreak]
+    [touchStreak, hydrated, userId]
   );
 
   const setPlacement = useCallback((result: PlacementResult) => {
@@ -358,18 +370,18 @@ function ProgressInner({
   }, [storageKey]);
 
   const lessonsCompletedCount = state.completedLessons.length;
-  const progress = xpProgress(state.xp);
+  const { level, current, needed, percent } = xpProgress(state.xp);
 
   const value = useMemo<ProgressContextValue>(
     () => ({
       xp: state.xp,
       streak: state.streak,
       lastActive: state.lastActive,
-      level: progress.level,
+      level,
       levelProgress: {
-        current: progress.current,
-        needed: progress.needed,
-        percent: progress.percent,
+        current,
+        needed,
+        percent,
       },
       completedLessons: new Set(state.completedLessons),
       quizResults: state.quizResults,
@@ -389,8 +401,15 @@ function ProgressInner({
       setDailyGoal,
       resetAll,
     }),
-    [state, lessonsCompletedCount, hydrated, completeLesson, recordQuiz, recordModuleQuiz, setUserName, completeOnboarding, setPlacement, setDailyGoal, resetAll, progress]
+    [state, lessonsCompletedCount, hydrated, completeLesson, recordQuiz, recordModuleQuiz, setUserName, completeOnboarding, setPlacement, setDailyGoal, resetAll, level, current, needed, percent]
   );
+
+  if (hydrationFailed) {
+    return <div role="alert" className="p-8 text-center">
+      <p>Data akun gagal dimuat. / Could not load account data.</p>
+      <button type="button" onClick={() => window.location.reload()}>Coba lagi / Retry</button>
+    </div>;
+  }
 
   return (
     <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>

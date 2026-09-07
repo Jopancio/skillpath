@@ -466,10 +466,15 @@ Create exactly 5 questions. Each has exactly 4 options and one correct answer. c
         : `\nMateri lengkap kursus yang harus menjadi dasar jawabanmu (kutip/parafrase materi ini, jangan mengarang isi sendiri):\n${material}\n`
       : "";
 
+    const formatInstr =
+      locale === "en"
+        ? "Formatting rules: do NOT use markdown headings (#, ##, ###). Use short paragraphs, bullet points (- ), and **bold** for key terms. Keep it compact and chat-friendly."
+        : "Aturan format: JANGAN gunakan heading markdown (#, ##, ###). Gunakan paragraf pendek, poin-poin (- ), dan **tebal** untuk istilah penting. Buat ringkas dan nyaman dibaca di chat.";
+
     const systemPrompt =
       locale === "en"
-        ? `You are a friendly learning assistant for the online course "${course.title}". Course description: ${course.description}. Course outline:\n${outline}${materialBlock}\nAbout the student: ${aboutStudent || "unknown"}\n${personalInstr}\nAnswer the student's questions clearly, concisely, and helpfully in English. Stay on-topic about the course material.`
-        : `Kamu adalah asisten belajar yang ramah untuk kursus online "${course.title}". Deskripsi kursus: ${course.description}. Garis besar kursus:\n${outline}${materialBlock}\nTentang siswa: ${aboutStudent || "belum diketahui"}\n${personalInstr}\nJawab pertanyaan siswa dengan jelas, ringkas, dan membantu dalam Bahasa Indonesia. Tetap fokus pada materi kursus.`;
+        ? `You are a friendly learning assistant for the online course "${course.title}". Course description: ${course.description}. Course outline:\n${outline}${materialBlock}\nAbout the student: ${aboutStudent || "unknown"}\n${personalInstr}\nAnswer the student's questions clearly, concisely, and helpfully in English. Stay on-topic about the course material.\n${formatInstr}`
+        : `Kamu adalah asisten belajar yang ramah untuk kursus online "${course.title}". Deskripsi kursus: ${course.description}. Garis besar kursus:\n${outline}${materialBlock}\nTentang siswa: ${aboutStudent || "belum diketahui"}\n${personalInstr}\nJawab pertanyaan siswa dengan jelas, ringkas, dan membantu dalam Bahasa Indonesia. Tetap fokus pada materi kursus.\n${formatInstr}`;
 
     const answer = await callAIChat(systemPrompt, history, question);
     return NextResponse.json({ answer });

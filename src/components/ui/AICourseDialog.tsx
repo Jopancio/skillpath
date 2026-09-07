@@ -112,7 +112,7 @@ function DialogInner({
   onCreated: (course: Course) => void;
   profile?: Record<string, string | number | undefined>;
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const { user } = useAuth();
   const ob = t.onboarding;
 
@@ -172,6 +172,7 @@ function DialogInner({
         body: JSON.stringify({
           skill: s,
           profile,
+          locale,
           ...(pdf
             ? { pdf: { name: pdf.name, size: pdf.size, data: pdf.dataUrl } }
             : {}),

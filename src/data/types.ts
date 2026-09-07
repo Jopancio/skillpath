@@ -40,7 +40,9 @@ export interface CourseModule {
   id: string;
   title: Localized;
   lessons: Lesson[];
-  /** End-of-chapter quiz ("Kuis 1", "Kuis 2", ...). Optional: legacy/builtin courses only have the final quiz. */
+  /** End-of-phase quiz ("Kuis 1", "Kuis 2", ...). Every phase now has one:
+   *  learners read the phase's 3 material slides, then pass this quiz to
+   *  unlock the next phase. Optional only for legacy/builtin data. */
   quiz?: QuizQuestion[];
 }
 

@@ -1,0 +1,236 @@
+# PROPOSAL APLIKASI WEB
+
+# SkillPath — Platform Belajar Skill Nonformal Bergaya Game
+
+**Tagline:** *Belajar Skill, Buka Jalan Kerja*
+
+---
+
+## BAB I — PENDAHULUAN
+
+### 1.1 Latar Belakang
+
+Tidak semua orang memiliki kesempatan, waktu, atau biaya untuk menempuh pendidikan formal hingga perguruan tinggi. Padahal, dunia kerja saat ini semakin terbuka terhadap tenaga kerja berbasis *skill* — barista, content creator, digital marketer, video editor, hingga UI/UX designer — yang bisa dipelajari secara nonformal.
+
+Masalahnya, platform belajar daring yang ada umumnya:
+
+1. Berbayar mahal atau mengunci materi penting di balik langganan,
+2. Menyajikan materi pasif (video panjang / dokumen) sehingga membosankan dan tingkat penyelesaian kursus rendah,
+3. Tidak memberikan jalur belajar terarah dari nol sampai siap kerja, dan
+4. Tidak mengakomodasi perbedaan gaya belajar tiap individu.
+
+**SkillPath** hadir sebagai platform web belajar skill nonformal yang **gratis untuk mulai**, **seru seperti bermain game** (XP, streak harian, level, badge, papan peringkat), memiliki **jalur belajar terstruktur dari nol sampai siap kerja**, serta didukung **AI** yang menyesuaikan materi dengan gaya belajar pengguna dan dapat membuat kursus baru apa pun sesuai permintaan pengguna.
+
+### 1.2 Tujuan
+
+1. Menyediakan akses belajar skill praktis siap kerja secara gratis dan fleksibel (HP/tablet/komputer).
+2. Meningkatkan konsistensi dan penyelesaian belajar melalui gamifikasi.
+3. Mempersonalisasi pengalaman belajar menggunakan AI berdasarkan profil gaya belajar pengguna.
+4. Memberikan bukti kompetensi berupa sertifikat digital untuk memperkuat portofolio dan CV pengguna.
+
+---
+
+## BAB II — PEMBAHASAN
+
+### A. Penjelasan tentang Aplikasi
+
+#### A.1 Metode Pengembangan
+
+Pengembangan SkillPath menggunakan metode **Agile dengan kerangka kerja Scrum**, dengan alasan:
+
+- Kebutuhan fitur (gamifikasi, AI, kursus) berkembang secara iteratif dan butuh umpan balik cepat.
+- Tim kecil dapat bekerja dalam **sprint pendek (1–2 minggu)** dengan target fitur yang jelas per sprint, misalnya: Sprint 1 = autentikasi & landing page, Sprint 2 = jalur belajar & pelacakan progres, Sprint 3 = gamifikasi (XP, streak, badge), Sprint 4 = integrasi AI (course builder, asisten belajar), Sprint 5 = sertifikat & polishing.
+- Setiap sprint diakhiri **review & retrospective** untuk mengevaluasi fitur dan memperbaiki sprint berikutnya.
+
+Praktik yang diterapkan: *product backlog* (daftar fitur), *daily check-in*, *sprint review*, dan *version control* dengan Git.
+
+#### A.2 Teknologi yang Digunakan
+
+| Kategori | Teknologi |
+|---|---|
+| Bahasa Pemrograman | **TypeScript** (JavaScript bertipe) |
+| Framework Front-end | **Next.js 16 (App Router)** di atas **React 19** |
+| Styling | **Tailwind CSS v4** |
+| Animasi | **Framer Motion**, **GSAP**, **OGL** (WebGL), **canvas-confetti** |
+| Back-end | **Next.js Route Handlers (API Routes)** — Node.js runtime |
+| Database | **Supabase (PostgreSQL)** dengan **Row Level Security (RLS)** |
+| Autentikasi | **Clerk** (login, registrasi, verifikasi email OTP, SSO) |
+| Kecerdasan Buatan (AI) | API kompatibel OpenAI (melalui CosmosHub) untuk pembuatan kursus, kuis, asisten belajar, dan evaluasi onboarding |
+| Visualisasi Peta Pikiran | **@xyflow/react (React Flow)** |
+| Pemrosesan PDF | **pdfjs-dist** (ekstraksi teks PDF materi referensi) |
+| Ikon | **lucide-react** |
+| Tools | Git, ESLint, VS Code, Vercel (deployment) |
+
+#### A.3 Arsitektur Sistem
+
+SkillPath menggunakan arsitektur **fullstack terpadu (monolith modern)** berbasis Next.js App Router, di mana front-end dan back-end berada dalam satu codebase, dengan layanan eksternal untuk autentikasi, database, dan AI.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                          PENGGUNA                                │
+│                 (Browser: HP / Tablet / Desktop)                 │
+└──────────────────────────────┬───────────────────────────────────┘
+                               │ HTTPS
+                               ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    NEXT.JS APP (Front-end + Back-end)            │
+│                                                                  │
+│  ┌────────────────────────┐   ┌───────────────────────────────┐  │
+│  │      FRONT-END         │   │        BACK-END (API)         │  │
+│  │  React 19 + Tailwind   │──▶│  Route Handlers:              │  │
+│  │  - Landing page        │   │  - /api/generate-course       │  │
+│  │  - Katalog kursus      │   │  - /api/course-assistant      │  │
+│  │  - Halaman belajar     │   │  - /api/onboarding-coach      │  │
+│  │  - Dashboard & profil  │   │                               │  │
+│  │  - Kuis & sertifikat   │   │  (membangun prompt, memanggil │  │
+│  │  - Mindmap, flashcard  │   │   AI, membersihkan output)    │  │
+│  └──────────┬─────────────┘   └──────────────┬────────────────┘  │
+└─────────────┼────────────────────────────────┼───────────────────┘
+              │                                │
+              ▼                                ▼
+┌──────────────────────┐          ┌──────────────────────────────┐
+│   LAYANAN EKSTERNAL  │          │             AI               │
+│                      │          │  (OpenAI-compatible API)     │
+│  ┌────────────────┐  │          │  - Menyusun kursus baru      │
+│  │     Clerk      │  │          │  - Menjawab pertanyaan       │
+│  │ (Autentikasi & │  │          │  - Membuat kuis & flashcard  │
+│  │  manajemen user)│  │          │  - Evaluasi gaya belajar     │
+│  └───────┬────────┘  │          └──────────────────────────────┘
+│          │ token     │
+│          ▼           │
+│  ┌────────────────┐  │
+│  │    Supabase    │  │
+│  │  (PostgreSQL)  │  │
+│  │  - progress    │  │
+│  │  - custom_     │  │
+│  │    courses     │  │
+│  │  (dengan RLS)  │  │
+│  └────────────────┘  │
+└──────────────────────┘
+```
+
+**Penjelasan lapisan:**
+
+1. **Front-end (React + Next.js App Router + Tailwind):** seluruh antarmuka — landing page, katalog kursus, jalur belajar, halaman pelajaran, kuis, dashboard gamifikasi, profil, pengaturan, dan halaman sertifikat. Konten kursus bawaan disimpan sebagai data terstruktur (TypeScript) di sisi klien, sedangkan progres pengguna disinkronkan ke database.
+2. **Back-end (Next.js Route Handlers):** tiga endpoint API server-side:
+   - `POST /api/generate-course` — menerima topik (+ opsional PDF) dan profil belajar pengguna, membangun prompt, memanggil AI, lalu membersihkan/memvalidasi JSON hasil menjadi kursus utuh (modul, pelajaran, kuis).
+   - `POST /api/course-assistant` — asisten "Tanya AI" yang menjawab pertanyaan seputar materi kursus, serta membuat catatan, flashcard, dan kuis latihan sesuai tingkat kesulitan.
+   - `POST /api/onboarding-coach` — mengevaluasi jawaban onboarding (gaya belajar, kuis diagnostik) dan menyusun jalur belajar personal.
+3. **Autentikasi (Clerk):** menangani registrasi, login, verifikasi email (kode OTP), dan SSO. Token sesi Clerk dipakai untuk mengotorisasi akses database.
+4. **Database (Supabase / PostgreSQL):** dua tabel utama — `progress` (XP, streak, pelajaran selesai, hasil kuis, catatan, flashcard) dan `custom_courses` (kursus buatan AI milik pengguna). **Row Level Security** memastikan setiap pengguna hanya bisa membaca/menulis datanya sendiri (kunci pada Clerk user ID). Bila database tidak terkonfigurasi, aplikasi tetap berjalan dengan penyimpanan `localStorage` sebagai cadangan.
+5. **AI (OpenAI-compatible API):** hanya diakses dari server agar API key tidak terekspos ke klien.
+
+#### A.4 Fitur dan Fungsi Web
+
+**1. Autentikasi & Onboarding Personal (Wizard)**
+Pengguna mendaftar/login via email (dengan verifikasi OTP) atau SSO. Setelah itu, wizard 12 langkah menggali profil belajar: tujuan (karir/usaha/hobi/sekolah), pengetahuan awal, pengalaman belajar, target harian, musuh fokus, tipe kerja, kelemahan memori, gaya belajar, dan tingkat ambisi. Jawaban ini menjadi dasar AI mempersonalisasi materi.
+
+**2. Katalog Kursus & Jalur Belajar Terarah**
+Tersedia kursus bawaan (Barista, Content Creator, Digital Marketing, Social Media, Video Editor, UI/UX, Fotografi) yang masing-masing tersusun atas **modul → pelajaran → kuis bab → kuis akhir**. Modul terbuka berurutan (modul berikutnya terkunci sebelum modul sebelumnya selesai), sehingga belajar terarah dari nol sampai siap kerja.
+
+**3. Gamifikasi (Belajar Seperti Main Game)**
+Setiap pelajaran selesai memberikan **XP**; akumulasi XP menaikkan **level**; belajar tiap hari menjaga **streak**; pencapaian tertentu membuka **badge**; terdapat **papan peringkat** dan animasi perayaan (confetti). Pengguna mengatur **target harian** (5–20 menit/hari) agar tetap konsisten.
+
+**4. AI Course Builder ("Tambah Skill Baru")**
+Pengguna mengetik skill apa pun (mis. "servis motor", "desain Canva") — opsional mengunggah **PDF materi referensi** (maks. 5 MB) — dan AI menyusun kursus lengkap dengan modul, pelajaran, dan kuis dalam ±15–30 detik, disesuaikan dengan profil gaya belajar pengguna. Kursus hasil AI tersimpan ke akun pengguna.
+
+**5. Alat Belajar (Study Tools) per Kursus**
+- **Catatan** — catatan manual per fase, atau rangkuman otomatis oleh AI.
+- **Flashcard** — kartu hafalan buatan sendiri atau dibuatkan AI dari materi.
+- **Kuis Latihan AI** — kuis dengan tingkat kesulitan pilihan (mudah/sedang/sulit) lengkap dengan pembahasan.
+- **Tanya AI** — tanya jawab bebas seputar materi kursus.
+- **Peta Pikiran (Mindmap)** — visualisasi struktur kursus interaktif.
+
+**6. Kuis Akhir & Sertifikat Digital**
+Setelah semua pelajaran selesai, pengguna mengerjakan kuis akhir. Jika lulus nilai minimum, **sertifikat digital** diterbitkan dengan nama, tanggal terbit, nilai, dan **ID verifikasi**, bisa diunduh/dicetak untuk memperkuat CV dan portofolio.
+
+**7. Dashboard, Profil & Pengaturan**
+Dashboard menampilkan total XP, level, streak, pelajaran selesai, kursus yang sedang diikuti, koleksi badge, dan papan peringkat. Halaman profil merangkum statistik dan profil belajar. Pengaturan menyediakan tema terang/gelap, bahasa, target harian, dan reset progres.
+
+### B. Permasalahan dan Solusi
+
+#### B.1 Analisis Permasalahan
+
+1. **Tingginya pengangguran dan kesenjangan keterampilan.** Indonesia memiliki jutaan pengangguran dan lulusan yang kesulitan memenuhi kebutuhan industri; banyak pekerjaan berbasis *skill* (barista, digital marketing, content creator, editor) tidak mensyaratkan ijazah formal tetapi mensyaratkan kemampuan praktis yang tidak diajarkan di sekolah.
+2. **Biaya pelatihan nonformal mahal.** Kursus offline/online berkualitas sering berharga ratusan ribu hingga jutaan rupiah, tidak terjangkau pelajar, pengangguran, atau pekerja bergaji kecil.
+3. **Rendahnya tingkat penyelesaian kursus daring.** Kursus daring konvensional (berbasis video/dokumen pasif) memiliki tingkat penyelesaian yang sangat rendah — umumnya di bawah 10% — karena membosankan dan tidak ada pendorong konsistensi.
+4. **Materi "satu ukuran untuk semua".** Platform belajar umumnya tidak menyesuaikan dengan gaya belajar individu (visual vs. praktik, teori dulu vs. langsung coba), padahal perbedaan ini sangat memengaruhi pemahaman.
+5. **Topik terbatas.** Katalog kursus tetap; pengguna yang ingin belajar skill spesifik yang tidak tersedia tidak terlayani.
+
+#### B.2 Strategi Solusi
+
+| Permasalahan | Solusi di SkillPath | Cara Kerja |
+|---|---|---|
+| Biaya mahal | Gratis untuk mulai | Semua kursus dasar, kuis, XP, dan sertifikat digital dapat diakses tanpa biaya |
+| Bosan, tidak selesai | Gamifikasi menyeluruh | XP, level, streak harian, badge, leaderboard, dan animasi perayaan memberi dorongan psikologis untuk kembali belajar setiap hari; target harian kecil (5–20 menit) membuat konsistensi realistis |
+| Belajar tidak terarah | Jalur belajar berjenjang | Modul terkunci berurutan; pengguna menempuh langkah demi langkah dari nol sampai siap kerja, ditutup kuis akhir sebagai validasi |
+| Materi tidak personal | Personalisasi AI | Wizard onboarding 12 langkah memetakan gaya belajar; AI menyesuaikan gaya penyampaian materi, kedalaman, dan jalur belajar personal, plus kuis diagnostik untuk menentukan titik mulai |
+| Topik terbatas | AI Course Builder | Pengguna meminta skill apa pun (atau mengunggah PDF) dan AI menyusun kursus lengkap dalam hitungan detik |
+| Butuh bukti kompetensi | Sertifikat digital | Lulus kuis akhir → sertifikat bernama, bernilai, dan ber-ID verifikasi untuk CV/LinkedIn/portofolio |
+| Belajar pasif | Praktik & alat belajar aktif | Latihan per modul, flashcard, kuis latihan AI berpembahasan, tanya-jawab AI, catatan, dan mindmap mendorong *active recall* |
+
+#### B.3 Dampak dan Implementasi
+
+**Prediksi dampak terhadap target pengguna:**
+
+1. **Akses keterampilan yang setara** — pelajar, pengangguran, ibu rumah tangga, dan pekerja yang ingin *reskill/upskill* dapat belajar skill siap kerja tanpa hambatan biaya dan lokasi (cukup browser HP).
+2. **Konsistensi belajar meningkat** — mekanisme streak, XP, dan target harian kecil mengubah belajar dari beban menjadi kebiasaan harian, berpotensi menaikkan tingkat penyelesaian kursus jauh di atas rata-rata kursus daring konvensional.
+3. **Employability meningkat** — jalur terarah + latihan praktik + sertifikat membantu pengguna membangun portofolio dan kepercayaan diri melamar kerja, membuka usaha, atau menjadi freelancer.
+4. **Pembelajaran seumur hidup tanpa batas topik** — AI Course Builder membuat platform tumbuh mengikuti kebutuhan pasar kerja, bahkan untuk skill yang sangat spesifik.
+
+**Potensi implementasi di dunia nyata:**
+
+1. **Individu & komunitas** — dipakai langsung oleh pencari kerja, freelancer pemula, dan pelajar SMK/mahasiswa sebagai pelengkap pendidikan formal.
+2. **Lembaga pelatihan & BLK (Balai Latihan Kerja)** — sebagai materi pendamping/blended learning dengan pelacakan progres peserta.
+3. **Sekolah & program CSR** — modul skill praktis untuk ekstrakurikuler atau program pemberdayaan masyarakat.
+4. **UMKM** — pemilik usaha kecil belajar digital marketing & social media untuk memasarkan produknya sendiri.
+5. **Skalabilitas konten** — kurasi kursus hasil AI yang populer menjadi kursus bawaan baru, dan potensi kemitraan sertifikasi dengan industri.
+
+---
+
+## BAB III — PENUTUP
+
+### 3.1 Kesimpulan
+
+SkillPath adalah platform web belajar skill nonformal yang menjawab empat masalah utama pembelajaran daring saat ini: **biaya mahal** (diatasi dengan akses gratis), **kebosanan dan rendahnya penyelesaian** (diatasi dengan gamifikasi penuh — XP, streak, level, badge, leaderboard), **materi yang tidak personal** (diatasi dengan onboarding cerdas dan personalisasi AI), serta **katalog topik yang terbatas** (diatasi dengan AI Course Builder yang dapat menyusun kursus apa pun, termasuk dari PDF).
+
+Dari sisi teknis, SkillPath dibangun dengan metode **Agile/Scrum**, menggunakan tumpukan teknologi modern — **Next.js 16 + React 19 + TypeScript + Tailwind CSS** di sisi aplikasi, **Clerk** untuk autentikasi, **Supabase (PostgreSQL + RLS)** untuk penyimpanan data yang aman, serta **API AI kompatibel OpenAI** yang hanya dipanggil dari server. Arsitektur fullstack terpadu membuat pengembangan cepat, deployment sederhana, dan aplikasi tetap berfungsi walau database belum terkonfigurasi (mode localStorage).
+
+### 3.2 Harapan
+
+Kami berharap SkillPath dapat:
+
+1. Membuka akses keterampilan siap kerja yang setara bagi siapa pun, tanpa memandang latar belakang pendidikan dan ekonomi.
+2. Menjadikan belajar sebagai kebiasaan yang menyenangkan, bukan beban.
+3. Menjadi jembatan antara pembelajar dan dunia kerja melalui jalur terarah dan sertifikat kompetensi.
+4. Terus berkembang — lebih banyak kursus, fitur komunitas/mentor, kemitraan industri untuk pengakuan sertifikat, dan integrasi lowongan kerja berbasis skill yang telah dikuasai pengguna.
+
+Dengan dukungan berbagai pihak, SkillPath berpotensi menjadi solusi nyata dalam mengurangi kesenjangan keterampilan dan pengangguran di Indonesia.
+
+---
+
+## DAFTAR PUSTAKA
+
+Badan Pusat Statistik. (2024). *Potret Pendidikan Indonesia: Statistik Pendidikan 2024*. Jakarta: BPS. https://www.bps.go.id
+
+Badan Pusat Statistik. (2024). *Keadaan Ketenagakerjaan Indonesia*. Jakarta: BPS. https://www.bps.go.id
+
+Deterding, S., Dixon, D., Khaled, R., & Nacke, L. (2011). From Game Design Elements to Gamefulness: Defining "Gamification". *Proceedings of the 15th International Academic MindTrek Conference*.
+
+Jordan, K. (2015). Massive Open Online Course Completion Rates Revisited: Assessment, Length and Attrition. *The International Review of Research in Open and Distributed Learning*, 16(3).
+
+Kementerian Ketenagakerjaan Republik Indonesia. (2023). *Data dan Informasi Ketenagakerjaan*. Jakarta: Kemnaker RI.
+
+Next.js Documentation. (2024). Vercel. https://nextjs.org/docs
+
+React Documentation. (2024). Meta Open Source. https://react.dev
+
+Supabase Documentation. (2024). https://supabase.com/docs
+
+Clerk Documentation. (2024). https://clerk.com/docs
+
+Schwaber, K., & Sutherland, J. (2020). *The Scrum Guide*. Scrum.org.
+
+---
+
+*Catatan: nomor/statistik resmi (mis. angka pengangguran terbaru) sebaiknya dikutip langsung dari publikasi BPS/Kemnaker terkini saat proposal difinalkan.*

@@ -17,7 +17,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
   Eye,
   EyeOff,
   Flame,
@@ -28,13 +27,11 @@ import {
   Mail,
   PartyPopper,
   RefreshCw,
-  Rocket,
   ShieldCheck,
   Sparkles,
   Trophy,
   User,
   UserPlus,
-  Zap,
 } from "lucide-react";
 // Clerk v7: sign-in/sign-up flows use the stable legacy hooks; useUser keeps
 // the current API.
@@ -45,6 +42,8 @@ import { AuroraBackdrop } from "@/components/auth/AuroraBackdrop";
 import { OtpInput } from "@/components/auth/OtpInput";
 import TextType from "@/components/ui/TextType";
 import { cn } from "@/lib/utils";
+import { useCustomCourses } from "@/hooks/use-custom-courses";
+import { readOnboardingDraft } from "@/lib/onboarding-draft";
 
 type Mode = "login" | "signup";
 
@@ -96,12 +95,6 @@ const ROLES = [
   "Digital Marketer",
   "Video Editor",
   "UI/UX Designer",
-];
-
-const PERKS = [
-  { icon: BadgeCheck, text: "100% gratis untuk mulai", chip: "bg-success/10 text-success" },
-  { icon: Zap, text: "Seru kayak main game", chip: "bg-primary/10 text-primary" },
-  { icon: Rocket, text: "Langsung siap kerja", chip: "bg-gold/15 text-deep-orange" },
 ];
 
 const RESEND_COOLDOWN = 30;
@@ -302,6 +295,20 @@ export default function LoginPage() {
   const { isLoaded: signUpLoaded, signUp } = useSignUp();
   const router = useRouter();
   const reduceMotion = useReducedMotion();
+  const { allCourses } = useCustomCourses();
+  const destination = (signup = false) =>
+    readOnboardingDraft(allCourses.map((c) => c.id)) ? "/onboarding" : signup ? "/onboarding?welcome=1" : "/";
+
+  const activateSession = async (session: string, signup = false) => {
+    if (!setActive) return;
+    // Capture before auth remounts the providers and this page.
+    const target = destination(signup);
+    await setActive({ session, navigate: ({ decorateUrl }) => {
+      const url = decorateUrl(target);
+      if (url.startsWith("http")) window.location.assign(url);
+      else router.replace(url);
+    } });
+  };
 
   const [mode, setMode] = useState<Mode>("login");
   const [name, setName] = useState("");
@@ -365,8 +372,7 @@ export default function LoginPage() {
           password,
         });
         if (res.status === "complete" && res.createdSessionId) {
-          await setActive({ session: res.createdSessionId, navigate: () => {} });
-          router.replace("/");
+          await activateSession(res.createdSessionId);
         } else {
           setError("Gagal login. Periksa kembali email dan passwordmu.");
         }
@@ -400,10 +406,7 @@ export default function LoginPage() {
         firstName: name.trim(),
       });
       if (res.status === "complete" && res.createdSessionId) {
-        // Skip Clerk's automatic redirect (afterSignUpUrl = "/") so the
-        // wizard (with its welcome animation) receives the user.
-        await setActive({ session: res.createdSessionId, navigate: () => {} });
-        router.replace("/onboarding");
+        await activateSession(res.createdSessionId, true);
         return;
       }
       // Email verification required before the account becomes active.
@@ -426,8 +429,7 @@ export default function LoginPage() {
     try {
       const res = await signUp.attemptEmailAddressVerification({ code: codeValue });
       if (res.status === "complete" && res.createdSessionId) {
-        await setActive({ session: res.createdSessionId, navigate: () => {} });
-        router.replace("/onboarding");
+        await activateSession(res.createdSessionId, true);
       } else {
         setError("Kode verifikasi salah.");
       }
@@ -465,7 +467,7 @@ export default function LoginPage() {
       await signIn.authenticateWithRedirect({
         strategy: "oauth_google",
         redirectUrl: "/sso-callback",
-        redirectUrlComplete: "/",
+        redirectUrlComplete: destination(mode === "signup"),
       });
     } catch {
       setError("Login Google gagal.");
@@ -554,31 +556,6 @@ export default function LoginPage() {
               cursorCharacter="▍"
               cursorClassName="text-primary"
             />
-          </motion.div>
-
-          {/* Perk chips */}
-          <motion.div
-            initial={reduceMotion ? false : "hidden"}
-            animate="show"
-            variants={{
-              hidden: {},
-              show: { transition: { staggerChildren: 0.09, delayChildren: 0.85 } },
-            }}
-            className="mt-5 flex flex-wrap gap-2"
-          >
-            {PERKS.map((perk) => (
-              <motion.span
-                key={perk.text}
-                variants={stepItem}
-                className={cn(
-                  "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-extrabold",
-                  perk.chip,
-                )}
-              >
-                <perk.icon className="h-3.5 w-3.5" />
-                {perk.text}
-              </motion.span>
-            ))}
           </motion.div>
 
           {/* Live demo quiz + floating achievement badges */}

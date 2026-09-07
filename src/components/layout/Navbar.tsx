@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  type TargetAndTransition,
+  type Transition,
+  type Variants,
+} from "framer-motion";
 import {
   ArrowRight,
   ChevronRight,
@@ -33,6 +40,19 @@ import { ThemeToggle } from "./ThemeToggle";
 
 /* Shared animation presets */
 const SPRING = { type: "spring", stiffness: 320, damping: 30 } as const;
+
+/** Glide of the active pill between nav items — snappy but weighty, with a
+ *  hint of overshoot so the pill feels like it "lands" on the new section. */
+const PILL_TRANSITION: Transition = {
+  layout: { type: "spring", stiffness: 420, damping: 32, mass: 0.9 },
+  default: { duration: 0.18, ease: "easeOut" },
+};
+
+/** Icon micro-pop played once when its section becomes active. */
+const ICON_POP: TargetAndTransition = {
+  scale: [1, 1.22, 0.96, 1],
+  rotate: [0, -6, 3, 0],
+};
 
 const asideVariants: Variants = {
   closed: { x: "100%" },
@@ -66,6 +86,7 @@ export function Navbar() {
   const router = useRouter();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   // Close the drawer when the route changes (render-time adjust, no effect).
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -118,6 +139,22 @@ export function Navbar() {
   // follow the reader as they scroll.
   const [activeAnchor, setActiveAnchor] = useState<string | null>(null);
 
+  // Clicking a section link claims the highlight immediately and pauses the
+  // scroll-spy briefly, so the pill glides straight to the target instead of
+  // being dragged through every intermediate section by the smooth scroll.
+  const [spyLock, setSpyLock] = useState<string | null>(null);
+  const selectAnchor = (href: string, anchor: boolean) => {
+    if (!anchor) return;
+    setActiveAnchor(href);
+    setSpyLock(href);
+  };
+
+  useEffect(() => {
+    if (!spyLock) return;
+    const id = window.setTimeout(() => setSpyLock(null), 1200);
+    return () => window.clearTimeout(id);
+  }, [spyLock]);
+
   // Clear the highlight when leaving the landing page (render-time adjust,
   // no effect).
   const [prevIsLanding, setPrevIsLanding] = useState(isLanding);
@@ -131,8 +168,10 @@ export function Navbar() {
 
     // Scroll-spy via a "reading line" ~40% down the viewport: the last
     // section whose top has crossed it is active. Above every section
-    // (hero) nothing qualifies -> no highlight.
+    // (hero) nothing qualifies -> no highlight. Paused while a clicked
+    // link owns the highlight (spyLock).
     const onScroll = () => {
+      if (spyLock) return;
       const line = window.innerHeight * 0.4;
       let current: string | null = null;
       for (const l of links) {
@@ -145,7 +184,7 @@ export function Navbar() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [isLanding, links]);
+  }, [isLanding, links, spyLock]);
 
   const handleLogout = async () => {
     setDrawerOpen(false);
@@ -161,7 +200,9 @@ export function Navbar() {
     .toUpperCase();
 
   const isDark = theme === "dark";
+  const isDashboard = !!pathname?.startsWith("/dashboard");
   const showXpChip = !!user && hydrated && xp > 0;
+  const showStreakChip = !!user && hydrated && streak > 0 && isDashboard;
 
   const loginButton = (
     <Link
@@ -207,9 +248,13 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop nav — floating segmented dock */}
+          {/* Desktop nav — floating segmented dock (landing page only;
+              app pages navigate via the hamburger drawer + sidebar) */}
           <nav
-            className="hidden items-center gap-1 rounded-full border border-border/50 bg-card/50 p-1 backdrop-blur-md lg:flex"
+            className={cn(
+              "items-center gap-1 rounded-full border border-border/50 bg-card/50 p-1 backdrop-blur-md",
+              isLanding ? "hidden lg:flex" : "hidden"
+            )}
             aria-label="Navigasi utama"
           >
             {links.map(({ href, label, icon: Icon, anchor }) => {
@@ -220,27 +265,48 @@ export function Navbar() {
                 <Link
                   key={href}
                   href={href}
+                  onClick={() => selectAnchor(href, anchor)}
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "relative flex items-center rounded-full px-4 py-2.5 text-sm font-bold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 xl:px-5",
                     active ? "text-white" : "text-muted hover:text-primary"
                   )}
                 >
-                  {active && (
-                    <motion.span
-                      layoutId="navbar-active-pill"
-                      className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-deep-orange shadow-soft"
-                      transition={SPRING}
-                    />
-                  )}
+                  <AnimatePresence initial={false}>
+                    {active && (
+                      <motion.span
+                        key="pill"
+                        layoutId="navbar-active-pill"
+                        className="absolute inset-0 rounded-full bg-gradient-to-r from-primary to-deep-orange shadow-[0_6px_20px_-6px_rgb(255_107_44/0.55)]"
+                        initial={reduceMotion ? false : { opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{
+                          opacity: 0,
+                          transition: { duration: reduceMotion ? 0 : 0.16 },
+                        }}
+                        transition={PILL_TRANSITION}
+                      />
+                    )}
+                  </AnimatePresence>
                   <motion.span
                     className="relative z-10 flex items-center gap-2"
                     initial={false}
-                    animate={{ scale: active ? 1.08 : 1 }}
-                    whileHover={active ? undefined : { scale: 1.05 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 18 }}
+                    animate={{ scale: active && !reduceMotion ? 1.05 : 1 }}
+                    whileHover={active || reduceMotion ? undefined : { scale: 1.05 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 16 }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <motion.span
+                      className="flex"
+                      initial={false}
+                      animate={
+                        active && !reduceMotion
+                          ? ICON_POP
+                          : { scale: 1, rotate: 0 }
+                      }
+                      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <Icon className="h-4 w-4" />
+                    </motion.span>
                     {label}
                   </motion.span>
                 </Link>
@@ -248,31 +314,52 @@ export function Navbar() {
             })}
           </nav>
 
-          {/* Desktop actions */}
-          <div className="hidden items-center gap-2 lg:flex">
-            <ThemeToggle />
-            <LocaleSwitcher />
-            {showXpChip && (
+          {/* Desktop actions (landing page only) */}
+          {isLanding && (
+            <div className="hidden items-center gap-2 lg:flex">
+              <ThemeToggle />
+              <LocaleSwitcher />
+              {showXpChip && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={SPRING}
+                  title={t.dashboard.totalXP}
+                  className="flex items-center gap-1.5 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-2 text-xs font-extrabold text-secondary"
+                >
+                  <Zap className="h-3.5 w-3.5 fill-current" />
+                  {xp} XP
+                </motion.span>
+              )}
+              {!user ? (
+                loginButton
+              ) : (
+                <UserMenu initials={initials} onLogout={handleLogout} />
+              )}
+            </div>
+          )}
+
+          {/* Hamburger actions — mobile on the landing page, every
+              viewport on app pages (dashboard, courses, …) */}
+          <div
+            className={cn(
+              "items-center gap-2",
+              isLanding ? "flex lg:hidden" : "flex"
+            )}
+          >
+            {showStreakChip && (
               <motion.span
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={SPRING}
-                title={t.dashboard.totalXP}
-                className="flex items-center gap-1.5 rounded-full border border-secondary/40 bg-secondary/10 px-3 py-2 text-xs font-extrabold text-secondary"
+                title={t.dashboard.dayStreak}
+                className="flex items-center gap-1.5 rounded-full border border-deep-orange/40 bg-deep-orange/10 px-3 py-2 text-xs font-extrabold text-deep-orange"
               >
-                <Zap className="h-3.5 w-3.5 fill-current" />
-                {xp} XP
+                <Flame className="h-3.5 w-3.5" />
+                <span className="tabular-nums">{streak}</span>
               </motion.span>
             )}
-            {!user ? (
-              loginButton
-            ) : (
-              <UserMenu initials={initials} onLogout={handleLogout} />
-            )}
-          </div>
-
-          {/* Mobile actions */}
-          <div className="flex items-center gap-2 lg:hidden">
+            {!isLanding && <ThemeToggle />}
             {!user ? (
               <Link
                 href="/login"
@@ -301,7 +388,10 @@ export function Navbar() {
         {drawerOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-50 bg-black/45 backdrop-blur-sm lg:hidden"
+              className={cn(
+                "fixed inset-0 z-50 bg-black/45 backdrop-blur-sm",
+                isLanding && "lg:hidden"
+              )}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -314,7 +404,10 @@ export function Navbar() {
               role="dialog"
               aria-modal="true"
               aria-label="Menu navigasi"
-              className="fixed inset-y-0 right-0 z-50 flex w-[86%] max-w-xs flex-col overflow-y-auto overscroll-contain border-l border-border bg-card shadow-card sm:max-w-sm lg:hidden"
+              className={cn(
+                "fixed inset-y-0 right-0 z-50 flex w-[86%] max-w-xs flex-col overflow-y-auto overscroll-contain border-l border-border bg-card shadow-card sm:max-w-sm",
+                isLanding && "lg:hidden"
+              )}
               initial="closed"
               animate="open"
               exit="closed"
@@ -412,18 +505,37 @@ export function Navbar() {
                       <motion.div key={href} whileTap={{ scale: 0.98 }}>
                         <Link
                           href={href}
-                          onClick={() => setDrawerOpen(false)}
+                          onClick={() => {
+                            setDrawerOpen(false);
+                            selectAnchor(href, anchor);
+                          }}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "group flex items-center gap-3 rounded-xl px-3 py-3.5 text-base font-bold transition-colors",
+                            "group relative flex items-center gap-3 rounded-xl px-3 py-3.5 text-base font-bold transition-colors duration-200",
                             active
-                              ? "bg-primary/10 text-primary"
+                              ? "text-primary"
                               : "text-foreground hover:bg-background"
                           )}
                         >
+                          <AnimatePresence initial={false}>
+                            {active && (
+                              <motion.span
+                                key="drawer-pill"
+                                layoutId="drawer-active-pill"
+                                className="absolute inset-0 rounded-xl bg-primary/10"
+                                initial={reduceMotion ? false : { opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{
+                                  opacity: 0,
+                                  transition: { duration: reduceMotion ? 0 : 0.16 },
+                                }}
+                                transition={PILL_TRANSITION}
+                              />
+                            )}
+                          </AnimatePresence>
                           <span
                             className={cn(
-                              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
+                              "relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors",
                               active
                                 ? "bg-primary/15 text-primary"
                                 : "bg-background text-muted group-hover:text-primary"
@@ -432,14 +544,19 @@ export function Navbar() {
                             <Icon className="h-4.5 w-4.5" />
                           </span>
                           <motion.span
-                            className="origin-left"
+                            className="relative z-10 origin-left"
                             initial={false}
-                            animate={{ scale: active ? 1.06 : 1 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            animate={{ scale: active && !reduceMotion ? 1.05 : 1 }}
+                            transition={{ type: "spring", stiffness: 420, damping: 17 }}
                           >
                             {label}
                           </motion.span>
-                          <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-muted/40 transition-transform duration-200 group-hover:translate-x-0.5" />
+                          <ChevronRight
+                            className={cn(
+                              "relative z-10 ml-auto h-4 w-4 shrink-0 transition-all duration-200 group-hover:translate-x-0.5",
+                              active ? "text-primary" : "text-muted/40"
+                            )}
+                          />
                         </Link>
                       </motion.div>
                     );

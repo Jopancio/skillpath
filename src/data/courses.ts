@@ -1,4 +1,9 @@
-import type { Course } from "./types";
+import type { Course, QuizQuestion } from "./types";
+
+/** Minimal progress shape needed for module gating (matches use-progress). */
+export interface ModuleQuizResultLike {
+  passed: boolean;
+}
 import { barista } from "./courses/barista";
 import { contentCreator } from "./courses/content-creator";
 import { digitalMarketing } from "./courses/digital-marketing";
@@ -71,18 +76,70 @@ export function firstLessonOfModule(course: Course, moduleIndex: number) {
   return course.modules[moduleIndex]?.lessons[0]?.id;
 }
 
-/** Is module unlocked? Module 0 always unlocked; others need all lessons of previous modules done */
+/**
+ * Is a module unlocked? Module 0 always is. Every previous module must be
+ * fully cleared: all of its lessons done AND — when it has an end-of-chapter
+ * quiz — that quiz passed. Material -> chapter quiz -> next material.
+ */
 export function isModuleUnlocked(
   course: Course,
   moduleIndex: number,
-  completed: ReadonlySet<string>
+  completed: ReadonlySet<string>,
+  moduleQuizResults?: Readonly<Record<string, ModuleQuizResultLike>>
 ): boolean {
   if (moduleIndex === 0) return true;
   for (let i = 0; i < moduleIndex; i++) {
-    const allDone = course.modules[i].lessons.every((l) => completed.has(l.id));
-    if (!allDone) return false;
+    const mod = course.modules[i];
+    const lessonsDone = mod.lessons.every((l) => completed.has(l.id));
+    if (!lessonsDone) return false;
+    if (mod.quiz && mod.quiz.length > 0) {
+      const passed = moduleQuizResults?.[`${course.id}::${mod.id}`]?.passed;
+      if (!passed) return false;
+    }
   }
   return true;
+}
+
+/**
+ * Effective per-lesson unlock within a phase: the phase's 3 material slides
+ * open one by one in order — slide 2 needs slide 1 done, slide 3 needs
+ * slides 1+2 done. The phase quiz then opens once all 3 slides are done.
+ */
+export function isLessonUnlocked(
+  course: Course,
+  moduleIndex: number,
+  lessonIndex: number,
+  completed: ReadonlySet<string>,
+  moduleQuizResults?: Readonly<Record<string, ModuleQuizResultLike>>
+): boolean {
+  if (!isModuleUnlocked(course, moduleIndex, completed, moduleQuizResults)) {
+    return false;
+  }
+  const lessons = course.modules[moduleIndex]?.lessons ?? [];
+  for (let i = 0; i < lessonIndex; i++) {
+    if (!completed.has(lessons[i]?.id)) return false;
+  }
+  return true;
+}
+
+/**
+ * The single chapter-quiz the learner should take right now: the earliest
+ * chapter whose lessons are all done but whose quiz is not passed yet.
+ */
+export function nextModuleQuiz(
+  course: Course,
+  completed: ReadonlySet<string>,
+  moduleQuizResults: Readonly<Record<string, ModuleQuizResultLike>>
+): { moduleIndex: number; quiz: QuizQuestion[] } | undefined {
+  for (let i = 0; i < course.modules.length; i++) {
+    const mod = course.modules[i];
+    if (!mod.quiz || mod.quiz.length === 0) continue;
+    if (!mod.lessons.every((l) => completed.has(l.id))) continue;
+    if (moduleQuizResults[`${course.id}::${mod.id}`]?.passed) continue;
+    if (!isModuleUnlocked(course, i, completed, moduleQuizResults)) continue;
+    return { moduleIndex: i, quiz: mod.quiz };
+  }
+  return undefined;
 }
 
 export function isCourseComplete(course: Course, completed: ReadonlySet<string>): boolean {

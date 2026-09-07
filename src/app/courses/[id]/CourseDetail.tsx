@@ -20,6 +20,7 @@ import { courseStats } from "@/data/types";
 import {
   isCourseComplete,
   isModuleUnlocked,
+  nextModuleQuiz,
 } from "@/data/courses";
 import { useI18n, pick } from "@/lib/i18n";
 import { useProgress } from "@/hooks/use-progress";
@@ -68,6 +69,18 @@ export function CourseDetail({ course: initial }: { course: Course }) {
 
   // Next lesson to continue
   const nextId = allLessonIds.find((id) => !completedLessons.has(id));
+
+  // Material -> chapter quiz -> next material: when every lesson so far is
+  // done but a chapter quiz is waiting, "continue" goes to that quiz first.
+  const pendingChapterQuiz = nextModuleQuiz(course, completedLessons, moduleQuizResults);
+  const pendingChapterIdx = pendingChapterQuiz?.moduleIndex ?? -1;
+  const pendingChapterMod =
+    pendingChapterIdx >= 0 ? course.modules[pendingChapterIdx] : undefined;
+  const continueHref = pendingChapterMod
+    ? `/quiz/${course.id}?module=${pendingChapterMod.id}`
+    : nextId
+      ? `/learn/${course.id}/${nextId}`
+      : undefined;
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-24 pt-10 lg:pb-10">
@@ -159,8 +172,8 @@ export function CourseDetail({ course: initial }: { course: Course }) {
             )}
 
             <div className="mt-6 flex flex-wrap gap-3">
-              {nextId && (
-                <ButtonLink href={`/learn/${course.id}/${nextId}`} size="lg">
+              {continueHref && (
+                <ButtonLink href={continueHref} size="lg">
                   {started ? t.courses.continueCourse : t.courses.enroll}
                   <ChevronRight className="h-5 w-5" />
                 </ButtonLink>
@@ -192,7 +205,12 @@ export function CourseDetail({ course: initial }: { course: Course }) {
 
       <div className="mt-6 space-y-6">
         {course.modules.map((mod, mi) => {
-          const unlocked = isModuleUnlocked(course, mi, completedLessons);
+          const unlocked = isModuleUnlocked(
+            course,
+            mi,
+            completedLessons,
+            moduleQuizResults
+          );
           const modDone = mod.lessons.filter((l) =>
             completedLessons.has(l.id)
           ).length;
@@ -251,31 +269,38 @@ export function CourseDetail({ course: initial }: { course: Course }) {
 
               {/* Lesson nodes */}
               <div className="mt-5 space-y-2.5">
-                {mod.lessons.map((lesson) => {
-                  const isDone = completedLessons.has(lesson.id);
-                  const inner = (
+                  {mod.lessons.map((lesson, li) => {
+                    const isDone = completedLessons.has(lesson.id);
+                    // In a chapter the lessons unlock one by one, in order.
+                    const prevDone = mod.lessons
+                      .slice(0, li)
+                      .every((l) => completedLessons.has(l.id));
+                    const lessonUnlocked = unlocked && prevDone;
+                    const inner = (
                     <>
                       <span
                         className={cn(
                           "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2",
                           isDone
                             ? "border-success bg-success text-white"
-                            : unlocked
+                            : lessonUnlocked
                               ? "border-primary/40 bg-background text-primary"
                               : "border-border bg-background text-muted"
                         )}
                       >
                         {isDone ? (
                           <CheckCircle2 className="h-4.5 w-4.5" />
-                        ) : (
+                        ) : lessonUnlocked ? (
                           <PlayCircle className="h-4.5 w-4.5" />
+                        ) : (
+                          <Lock className="h-4 w-4" />
                         )}
                       </span>
                       <span className="flex-1">
                         <span
                           className={cn(
                             "block text-sm font-bold",
-                            !unlocked && "text-muted"
+                            !lessonUnlocked && "text-muted"
                           )}
                         >
                           {pick(locale, lesson.title)}
@@ -284,13 +309,13 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                           {lesson.duration} {t.common.minutes} · {lesson.xp} XP
                         </span>
                       </span>
-                      {unlocked && (
+                      {lessonUnlocked && (
                         <ChevronRight className="h-4 w-4 text-muted" />
                       )}
                     </>
                   );
 
-                  return unlocked ? (
+                  return lessonUnlocked ? (
                     <Link
                       key={lesson.id}
                       href={`/learn/${course.id}/${lesson.id}`}
@@ -348,7 +373,11 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                       <span className="block text-xs font-semibold text-muted">
                         {mq?.passed
                           ? `${t.quiz.yourScore}: ${mq.score}%`
-                          : t.courses.moduleQuizDesc}
+                          : chapterQuizReady
+                            ? t.courses.moduleQuizReady
+                            : !unlocked
+                              ? t.courses.unlockHint
+                              : t.courses.moduleQuizDesc}
                       </span>
                     </span>
                     {chapterQuizReady && !mq?.passed ? (

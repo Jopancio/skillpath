@@ -1,5 +1,9 @@
 import type { QuizQuestion } from "@/data/types";
-import { describeProfile, type CourseProfile } from "./ai-course";
+import {
+  describeProfile,
+  type AiLocale,
+  type CourseProfile,
+} from "./ai-course";
 
 /**
  * AI onboarding coach: evaluates wizard answers, optionally asks a
@@ -83,9 +87,10 @@ function loc(text: string): { id: string; en: string } {
 
 function profileBlock(
   profile: CourseProfile | undefined,
-  clarifications: { question: string; answer: string }[]
+  clarifications: { question: string; answer: string }[],
+  locale: AiLocale = "id"
 ): string {
-  const lines = describeProfile(profile);
+  const lines = describeProfile(profile, locale);
   for (const c of clarifications) {
     lines.push(`- ${c.question} → ${c.answer}`);
   }
@@ -106,8 +111,11 @@ function courseBlock(courses: CoachCourse[]): string {
 export function buildEvaluatePrompt(
   profile: CourseProfile | undefined,
   courses: CoachCourse[],
-  clarifications: { question: string; answer: string }[]
+  clarifications: { question: string; answer: string }[],
+  locale: AiLocale = "id"
 ): string {
+  const en = locale === "en";
+  const lang = en ? "English" : "Indonesian";
   const clarificationBlock =
     clarifications.length > 0
       ? `
@@ -116,7 +124,7 @@ The learner already answered your previous clarifying question(s). You MUST NOT 
 If (and only if) a critical piece of information is missing or ambiguous and would significantly change the diagnostic quiz, respond with type "clarify" and ask ONE short question with 2-4 short answer options. Otherwise respond with type "ok".`;
 
   return `You are a friendly learning coach at SkillPath, an informal skill-learning app.
-${profileBlock(profile, clarifications)}${courseBlock(courses)}
+${profileBlock(profile, clarifications, locale)}${courseBlock(courses)}
 Your task: evaluate the learner's answers and prepare a short diagnostic quiz so you can understand their starting level.
 
 Respond with ONLY a valid JSON object in one of these two shapes:
@@ -125,7 +133,7 @@ A) If you need one more clarification:
 {
   "type": "clarify",
   "question": {
-    "question": "one short friendly question in Indonesian",
+    "question": "one short friendly question in ${lang}",
     "options": ["option A", "option B", "option C"]
   }
 }
@@ -138,7 +146,7 @@ B) If ready (this is the usual case):
     "courseTitle": "its title",
     "questions": [
       {
-        "question": "diagnostic question in Indonesian",
+        "question": "diagnostic question in ${lang}",
         "options": ["A", "B", "C", "D"],
         "correctIndex": 0,
         "explanation": "one sentence explanation"
@@ -146,12 +154,12 @@ B) If ready (this is the usual case):
     ]
   },
   "plan": {
-    "overview": "1-2 Indonesian sentences summarizing the personalized learning journey",
+    "overview": "1-2 ${lang} sentences summarizing the personalized learning journey",
     "steps": [
       {
-        "title": "step title in Indonesian",
+        "title": "step title in ${lang}",
         "description": "1-2 sentences of what to learn/do in this step",
-        "duration": "estimated time, e.g. '1 minggu'"
+        "duration": "estimated time, e.g. '${en ? "1 week" : "1 minggu"}'"
       }
     ],
     "materials": ["key topic/material to master, short phrase"]
@@ -159,7 +167,7 @@ B) If ready (this is the usual case):
 }
 
 Rules:
-- Write everything in Indonesian (Bahasa Indonesia).
+- Write everything in ${en ? "English" : "Indonesian (Bahasa Indonesia)"}.
 - Exactly 5 diagnostic questions.
 - Question difficulty must match the learner's self-reported knowledge: easy basics if they start from zero, deeper scenarios if they already know the basics.
 - Each question has exactly 4 options and exactly one correct answer; correctIndex is 0-based (0-3) and varies across questions.
@@ -255,23 +263,25 @@ export function buildResultPrompt(
   scorePercent: number,
   correct: number,
   total: number,
-  qa: { question: string; correct: boolean }[]
+  qa: { question: string; correct: boolean }[],
+  locale: AiLocale = "id"
 ): string {
+  const en = locale === "en";
   const qaLines = qa
     .map(
       (item, i) =>
-        `${i + 1}. ${item.question} — ${item.correct ? "BENAR" : "SALAH"}`
+        `${i + 1}. ${item.question} — ${item.correct ? (en ? "CORRECT" : "BENAR") : en ? "WRONG" : "SALAH"}`
     )
     .join("\n");
 
   return `You are a friendly learning coach at SkillPath.
-${profileBlock(profile, [])}
+${profileBlock(profile, [], locale)}
 The learner just completed a diagnostic quiz about "${courseTitle}":
 - Score: ${correct}/${total} (${scorePercent}%)
 - Details:
 ${qaLines}
 
-Write a short, warm evaluation in Indonesian. Respond with ONLY a valid JSON object:
+Write a short, warm evaluation in ${en ? "English" : "Indonesian"}. Respond with ONLY a valid JSON object:
 {
   "level": "beginner" | "intermediate" | "advanced",
   "message": "2-3 friendly sentences addressed to the learner, mentioning what their answers show and encouraging them",
@@ -286,7 +296,10 @@ Rules:
 - No markdown, no code fences — JSON only.`;
 }
 
-export function sanitizePlacementResult(raw: unknown): PlacementResult {
+export function sanitizePlacementResult(
+  raw: unknown,
+  locale: AiLocale = "id"
+): PlacementResult {
   const data = raw as Record<string, unknown>;
   const level =
     data?.level === "intermediate" || data?.level === "advanced"
@@ -300,7 +313,9 @@ export function sanitizePlacementResult(raw: unknown): PlacementResult {
     : [];
   return {
     level,
-    message: String(data?.message ?? "").trim() || "Semangat belajar!",
+    message:
+      String(data?.message ?? "").trim() ||
+      (locale === "en" ? "Keep up the learning spirit!" : "Semangat belajar!"),
     tips,
     strengths,
   };
@@ -317,18 +332,57 @@ export function sanitizePlacementResult(raw: unknown): PlacementResult {
  */
 export function buildLearningStylePrompt(
   profile: CourseProfile | undefined,
-  courses: CoachCourse[]
+  courses: CoachCourse[],
+  locale: AiLocale = "id"
 ): string {
-  const profileLines = describeProfile(profile);
+  const en = locale === "en";
+  const profileLines = describeProfile(profile, locale);
   const profileBlock =
     profileLines.length > 0
-      ? `\nProfil pembelajar (jawaban personalisasi):\n${profileLines.join("\n")}\n`
+      ? en
+        ? `\nLearner profile (personalization answers):\n${profileLines.join("\n")}\n`
+        : `\nProfil pembelajar (jawaban personalisasi):\n${profileLines.join("\n")}\n`
       : "";
 
   const courseBlock =
     courses.length > 0
-      ? `\nMinat skill: ${courses.map((c) => c.title).join(", ")}\n`
+      ? en
+        ? `\nSkill interests: ${courses.map((c) => c.title).join(", ")}\n`
+        : `\nMinat skill: ${courses.map((c) => c.title).join(", ")}\n`
       : "";
+
+  if (en) {
+    return `You are a learning coach at SkillPath, an informal skill-learning app.
+${profileBlock}${courseBlock}
+Your task: evaluate this learner's learning style based on their personalization answers, then explain how the AI will adapt the material for them.
+
+Pay special attention to:
+- workType (0=speed, 100=accuracy) — working style
+- memory (0=forgets details, 100=struggles with big concepts) — memory weakness
+- learningStyle (0=theory first, 100=straight to practice) — learning preference
+- graspMethod — fastest way to grasp complex material
+- focusEnemy — main focus distraction
+- ambition (1-10) — ambition level
+
+Determine a short, catchy "styleType" (2-3 words, e.g. "Visual Practitioner", "Systematic Thinker", "Fast Explorer") plus 1 emoji that represents it.
+
+Respond ONLY with valid JSON in this shape:
+{
+  "styleType": "dominant learning style name (2-3 words)",
+  "styleEmoji": "1 emoji",
+  "summary": "1-2 friendly sentences explaining their learning style",
+  "traits": ["trait 1", "trait 2", "trait 3"],
+  "adaptations": ["how material will be adapted 1", "2", "3"],
+  "challenges": ["thing to watch out for 1", "2"]
+}
+
+Rules:
+- All text in English.
+- traits: 3-4 short items about how they learn/work.
+- adaptations: 3-4 concrete items about how the material will be adapted (e.g. "lots of diagrams", "short step breakdowns", "light quizzes after concepts").
+- challenges: 2-3 items that might hinder them (based on focusEnemy & memory weakness).
+- No markdown, no code fences — JSON only.`;
+  }
 
   return `Kamu adalah pelatih belajar di SkillPath, aplikasi belajar skill nonformal.
 ${profileBlock}${courseBlock}
@@ -363,15 +417,23 @@ Aturan:
 }
 
 /** Membersihkan output AI untuk LearningStyleResult. */
-export function sanitizeLearningStyleResult(raw: unknown): LearningStyleResult {
+export function sanitizeLearningStyleResult(
+  raw: unknown,
+  locale: AiLocale = "id"
+): LearningStyleResult {
   const data = raw as Record<string, unknown>;
+  const en = locale === "en";
 
   const toArray = (v: unknown, max: number): string[] =>
     Array.isArray(v)
       ? v.map(String).map((s) => s.trim()).filter(Boolean).slice(0, max)
       : [];
 
-  const styleType = String(data?.styleType ?? "Pembelajar Seimbang").trim().slice(0, 60);
+  const styleType = String(
+    data?.styleType ?? (en ? "Balanced Learner" : "Pembelajar Seimbang")
+  )
+    .trim()
+    .slice(0, 60);
   let styleEmoji = String(data?.styleEmoji ?? "🎯").trim();
   // Ambil satu grapheme pertama (jaga-jaga AI ngasih banyak emoji).
   // Heuristik aman untuk ES2017: emoji umumnya bukan ASCII printable.
@@ -386,8 +448,11 @@ export function sanitizeLearningStyleResult(raw: unknown): LearningStyleResult {
   return {
     styleType,
     styleEmoji,
-    summary: String(data?.summary ?? "").trim().slice(0, 280) ||
-      "Gaya belajarmu unik — AI akan menyesuaikan materi sesuai kebutuhanmu.",
+    summary:
+      String(data?.summary ?? "").trim().slice(0, 280) ||
+      (en
+        ? "Your learning style is unique — the AI will adapt the material to your needs."
+        : "Gaya belajarmu unik — AI akan menyesuaikan materi sesuai kebutuhanmu."),
     traits: toArray(data?.traits, 5),
     adaptations: toArray(data?.adaptations, 5),
     challenges: toArray(data?.challenges, 4),
