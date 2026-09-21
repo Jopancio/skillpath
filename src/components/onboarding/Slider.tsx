@@ -14,7 +14,7 @@ interface EmojiBucket {
 
 /**
  * A polished two-sided labeled slider (0-100) with a big dynamic emoji
- * in the center that changes as the value moves — giving playful
+ * in the center that changes as the value moves â€” giving playful
  * feedback similar to the AmbitionSlider.
  */
 export function Slider({

@@ -57,7 +57,7 @@ function sanitizeProfile(raw: unknown): CourseProfile | undefined {
 /**
  * Validate the client-uploaded PDF: must be application/pdf, <= 5 MB.
  * Returns a PdfReferenceInput with the extracted plain text (used only to
- * build the prompt — never stored), plus metadata for the Course.
+ * build the prompt â€” never stored), plus metadata for the Course.
  */
 async function sanitizePdf(raw: unknown): Promise<PdfReferenceInput | undefined> {
   if (!raw || typeof raw !== "object") return undefined;

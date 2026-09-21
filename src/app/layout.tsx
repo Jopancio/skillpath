@@ -21,7 +21,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "SkillPath — Belajar Skill, Buka Jalan Kerja",
+  title: "SkillPath â€” Belajar Skill, Buka Jalan Kerja",
   description:
     "Platform belajar skill nonformal bergaya game: barista, content creator, digital marketing, dan lainnya. Tanpa kuliah, langsung siap kerja.",
 };

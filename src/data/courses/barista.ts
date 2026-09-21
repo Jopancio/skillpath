@@ -235,8 +235,8 @@ export const barista: Course = {
             duration: 7,
             xp: 25,
             body: {
-              id: "Rasio ideal espresso: **1:2** (18g kopi → 36g cairan) dalam **25-30 detik**.\n\n**Tanda ekstraksi:**\n- Terlalu cepat (<20 dtk) → asam, encer (*under-extracted*)\n- Terlalu lama (>35 dtk) → pahit gosong (*over-extracted*)\n\n**Atur grind size**: makin halus makin lambat menetes. Suhu air ideal 90-96°C.",
-              en: "Ideal espresso ratio: **1:2** (18g coffee → 36g liquid) in **25-30 seconds**.\n\n**Extraction signs:**\n- Too fast (<20s) → sour, watery (*under-extracted*)\n- Too slow (>35s) → burnt bitter (*over-extracted*)\n\n**Adjust grind size**: finer = slower drip. Ideal water temperature 90-96°C.",
+              id: "Rasio ideal espresso: **1:2** (18g kopi â†’ 36g cairan) dalam **25-30 detik**.\n\n**Tanda ekstraksi:**\n- Terlalu cepat (<20 dtk) â†’ asam, encer (*under-extracted*)\n- Terlalu lama (>35 dtk) â†’ pahit gosong (*over-extracted*)\n\n**Atur grind size**: makin halus makin lambat menetes. Suhu air ideal 90-96Â°C.",
+              en: "Ideal espresso ratio: **1:2** (18g coffee â†’ 36g liquid) in **25-30 seconds**.\n\n**Extraction signs:**\n- Too fast (<20s) â†’ sour, watery (*under-extracted*)\n- Too slow (>35s) â†’ burnt bitter (*over-extracted*)\n\n**Adjust grind size**: finer = slower drip. Ideal water temperature 90-96Â°C.",
             },
           },
         {
@@ -278,10 +278,10 @@ export const barista: Course = {
         id: "barista-m4-cq2",
         question: { id: "", en: "" },
         options: [
-          { id: "70-80°C", en: "70-80°C" },
-          { id: "90-96°C", en: "90-96°C" },
-          { id: "100°C mendidih", en: "100°C boiling" },
-          { id: "60°C hangat", en: "60°C warm" },
+          { id: "70-80Â°C", en: "70-80Â°C" },
+          { id: "90-96Â°C", en: "90-96Â°C" },
+          { id: "100Â°C mendidih", en: "100Â°C boiling" },
+          { id: "60Â°C hangat", en: "60Â°C warm" },
         ],
         correctIndex: 1,
       },
@@ -606,10 +606,10 @@ export const barista: Course = {
         id: "barista-m9-cq2",
         question: { id: "", en: "" },
         options: [
-          { id: "70-80°C", en: "70-80°C" },
-          { id: "90-96°C", en: "90-96°C" },
-          { id: "100°C mendidih", en: "100°C boiling" },
-          { id: "60°C hangat", en: "60°C warm" },
+          { id: "70-80Â°C", en: "70-80Â°C" },
+          { id: "90-96Â°C", en: "90-96Â°C" },
+          { id: "100Â°C mendidih", en: "100Â°C boiling" },
+          { id: "60Â°C hangat", en: "60Â°C warm" },
         ],
         correctIndex: 1,
       },
@@ -626,8 +626,8 @@ export const barista: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Waktunya merangkai semua yang sudah kamu pelajari menjadi satu alur kerja utuh.\n\n**Simulasi shift nyata (15 menit):**\n1. Siapkan *mise en place*: cek stok biji, susu, dan kebersihan station\n2. Terima pesanan: ulangi pesanan pelanggan untuk konfirmasi\n3. Seduh espresso dengan rasio 1:2 sambil steaming susu\n4. Tuang dan sajikan dalam 3-4 menit per cup\n\n**Checklist kualitas:** crema keemasan, suhu susu 60-65°C, gelas bersih, senyum.\n\n## Latihan Praktis\nRekam dirimu membuat 3 minuman berbeda (espresso, cappuccino, latte). Hitung waktunya dan nilai dengan checklist di atas. Ulangi sampai konsisten di bawah 4 menit per cup.",
-          en: "Time to connect everything you've learned into one complete workflow.\n\n**Real shift simulation (15 minutes):**\n1. Set up *mise en place*: check bean and milk stock, clean the station\n2. Take the order: repeat it back to confirm\n3. Pull espresso at a 1:2 ratio while steaming milk\n4. Pour and serve within 3-4 minutes per cup\n\n**Quality checklist:** golden crema, milk at 60-65°C, clean cup, smile.\n\n## Practical Exercise\nRecord yourself making 3 different drinks (espresso, cappuccino, latte). Time it and grade with the checklist above. Repeat until consistently under 4 minutes per cup.",
+          id: "Waktunya merangkai semua yang sudah kamu pelajari menjadi satu alur kerja utuh.\n\n**Simulasi shift nyata (15 menit):**\n1. Siapkan *mise en place*: cek stok biji, susu, dan kebersihan station\n2. Terima pesanan: ulangi pesanan pelanggan untuk konfirmasi\n3. Seduh espresso dengan rasio 1:2 sambil steaming susu\n4. Tuang dan sajikan dalam 3-4 menit per cup\n\n**Checklist kualitas:** crema keemasan, suhu susu 60-65Â°C, gelas bersih, senyum.\n\n## Latihan Praktis\nRekam dirimu membuat 3 minuman berbeda (espresso, cappuccino, latte). Hitung waktunya dan nilai dengan checklist di atas. Ulangi sampai konsisten di bawah 4 menit per cup.",
+          en: "Time to connect everything you've learned into one complete workflow.\n\n**Real shift simulation (15 minutes):**\n1. Set up *mise en place*: check bean and milk stock, clean the station\n2. Take the order: repeat it back to confirm\n3. Pull espresso at a 1:2 ratio while steaming milk\n4. Pour and serve within 3-4 minutes per cup\n\n**Quality checklist:** golden crema, milk at 60-65Â°C, clean cup, smile.\n\n## Practical Exercise\nRecord yourself making 3 different drinks (espresso, cappuccino, latte). Time it and grade with the checklist above. Repeat until consistently under 4 minutes per cup.",
         },
         },
         {
@@ -658,13 +658,13 @@ export const barista: Course = {
         id: "barista-m10-cq1",
         question: { id: "Suhu susu steamed yang ideal untuk latte adalah...", en: "The ideal steamed milk temperature for a latte is..." },
         options: [
-          { id: "40-45°C", en: "40-45°C" },
-          { id: "60-65°C", en: "60-65°C" },
-          { id: "80-90°C", en: "80-90°C" },
-          { id: "100°C mendidih", en: "100°C boiling" },
+          { id: "40-45Â°C", en: "40-45Â°C" },
+          { id: "60-65Â°C", en: "60-65Â°C" },
+          { id: "80-90Â°C", en: "80-90Â°C" },
+          { id: "100Â°C mendidih", en: "100Â°C boiling" },
         ],
         correctIndex: 1,
-        explanation: { id: "Susu di atas 70°C kehilangan manisnya dan foam jadi rusak; 60-65°C adalah titik manisnya.", en: "Milk above 70°C loses its sweetness and the foam breaks; 60-65°C is the sweet spot." },
+        explanation: { id: "Susu di atas 70Â°C kehilangan manisnya dan foam jadi rusak; 60-65Â°C adalah titik manisnya.", en: "Milk above 70Â°C loses its sweetness and the foam breaks; 60-65Â°C is the sweet spot." },
       },
       {
         id: "barista-m10-cq2",
@@ -691,8 +691,8 @@ export const barista: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Buktikan kemampuanmu lewat proyek nyata: sajikan 3 minuman signature untuk 3 'pelanggan' (teman atau keluarga).\n\n**Tantangan:**\n- Rancang menu mini berisi 3 minuman berbeda tingkat kesulitan\n- Sajikan lengkap dengan penjelasan rasa ke tiap 'pelanggan'\n- Minta feedback tertulis dan catat yang harus diperbaiki\n\nProyek ini melatih konsistensi, kecepatan, sekaligus komunikasi — tiga hal yang dinilai saat trial kerja di coffee shop.\n\n## Latihan Praktis\nDokumentasikan proyekmu: foto tiap minuman + catatan feedback. Simpan sebagai bukti awal portofolio baristamu.",
-          en: "Prove your skill with a real project: serve 3 signature drinks to 3 'customers' (friends or family).\n\n**The challenge:**\n- Design a mini menu of 3 drinks with different difficulty levels\n- Serve each with a taste explanation to the 'customer'\n- Ask for written feedback and note what to improve\n\nThis project trains consistency, speed, and communication — the three things judged during a coffee shop job trial.\n\n## Practical Exercise\nDocument your project: photo of each drink + feedback notes. Keep it as the first proof of your barista portfolio.",
+          id: "Buktikan kemampuanmu lewat proyek nyata: sajikan 3 minuman signature untuk 3 'pelanggan' (teman atau keluarga).\n\n**Tantangan:**\n- Rancang menu mini berisi 3 minuman berbeda tingkat kesulitan\n- Sajikan lengkap dengan penjelasan rasa ke tiap 'pelanggan'\n- Minta feedback tertulis dan catat yang harus diperbaiki\n\nProyek ini melatih konsistensi, kecepatan, sekaligus komunikasi â€” tiga hal yang dinilai saat trial kerja di coffee shop.\n\n## Latihan Praktis\nDokumentasikan proyekmu: foto tiap minuman + catatan feedback. Simpan sebagai bukti awal portofolio baristamu.",
+          en: "Prove your skill with a real project: serve 3 signature drinks to 3 'customers' (friends or family).\n\n**The challenge:**\n- Design a mini menu of 3 drinks with different difficulty levels\n- Serve each with a taste explanation to the 'customer'\n- Ask for written feedback and note what to improve\n\nThis project trains consistency, speed, and communication â€” the three things judged during a coffee shop job trial.\n\n## Practical Exercise\nDocument your project: photo of each drink + feedback notes. Keep it as the first proof of your barista portfolio.",
         },
         },
         {
@@ -756,8 +756,8 @@ export const barista: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Sebagian besar coffee shop menilai calon barista lewat **trial shift** — bekerja langsung beberapa jam.\n\n**Yang dinilai saat trial:**\n- Kebersihan dan kerapian station (paling pertama dilihat!)\n- Kecepatan tanpa panik saat antrian panjang\n- Kerja sama dengan tim dan komunikasi\n- Kerendahan hati untuk belajar menu rumah mereka\n\n**Tips melamar:** siapkan CV singkat + foto hasil karyamu, datang di luar jam sibuk, dan tanya kapan bisa trial.\n\n## Latihan Praktis\nBuat CV satu halaman berisi skill baristamu dan daftar 5 coffee shop target. Kirim ke minimal 3 minggu ini.",
-          en: "Most coffee shops judge barista candidates through a **trial shift** — working directly for a few hours.\n\n**What is judged during a trial:**\n- Station cleanliness and tidiness (the very first thing seen!)\n- Speed without panicking during a long queue\n- Teamwork and communication\n- Humility to learn their house menu\n\n**Application tips:** prepare a one-page CV + photos of your work, come outside peak hours, and ask when you can do a trial.\n\n## Practical Exercise\nMake a one-page CV listing your barista skills and a list of 5 target coffee shops. Send it to at least 3 this week.",
+          id: "Sebagian besar coffee shop menilai calon barista lewat **trial shift** â€” bekerja langsung beberapa jam.\n\n**Yang dinilai saat trial:**\n- Kebersihan dan kerapian station (paling pertama dilihat!)\n- Kecepatan tanpa panik saat antrian panjang\n- Kerja sama dengan tim dan komunikasi\n- Kerendahan hati untuk belajar menu rumah mereka\n\n**Tips melamar:** siapkan CV singkat + foto hasil karyamu, datang di luar jam sibuk, dan tanya kapan bisa trial.\n\n## Latihan Praktis\nBuat CV satu halaman berisi skill baristamu dan daftar 5 coffee shop target. Kirim ke minimal 3 minggu ini.",
+          en: "Most coffee shops judge barista candidates through a **trial shift** â€” working directly for a few hours.\n\n**What is judged during a trial:**\n- Station cleanliness and tidiness (the very first thing seen!)\n- Speed without panicking during a long queue\n- Teamwork and communication\n- Humility to learn their house menu\n\n**Application tips:** prepare a one-page CV + photos of your work, come outside peak hours, and ask when you can do a trial.\n\n## Practical Exercise\nMake a one-page CV listing your barista skills and a list of 5 target coffee shops. Send it to at least 3 this week.",
         },
         },
         {
@@ -893,10 +893,10 @@ export const barista: Course = {
     id: "barista-q8",
     question: { id: "", en: "" },
     options: [
-      { id: "70-80°C", en: "70-80°C" },
-      { id: "90-96°C", en: "90-96°C" },
-      { id: "100°C mendidih", en: "100°C boiling" },
-      { id: "60°C hangat", en: "60°C warm" },
+      { id: "70-80Â°C", en: "70-80Â°C" },
+      { id: "90-96Â°C", en: "90-96Â°C" },
+      { id: "100Â°C mendidih", en: "100Â°C boiling" },
+      { id: "60Â°C hangat", en: "60Â°C warm" },
     ],
     correctIndex: 1,
   },

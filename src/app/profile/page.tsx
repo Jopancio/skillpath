@@ -101,7 +101,7 @@ export default function ProfilePage() {
       icon: Flame,
       label: t.profile.dailyGoal,
       option: goal
-        ? { emoji: "🎯", label: `${goal.minutes} ${t.profile.minutesPerDay}` }
+        ? { emoji: "ðŸŽ¯", label: `${goal.minutes} ${t.profile.minutesPerDay}` }
         : undefined,
     },
   ];
@@ -114,7 +114,7 @@ export default function ProfilePage() {
         animate="show"
         className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 md:py-10 lg:py-12"
       >
-        {/* ── Header / account card ────────────────────────────── */}
+        {/* â”€â”€ Header / account card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section
           variants={itemVariants}
           className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card"
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                       }`}
                       aria-live="polite"
                     >
-                      ✓ {t.profile.saved}
+                      âœ“ {t.profile.saved}
                     </span>
                   </div>
                 )}
@@ -224,7 +224,7 @@ export default function ProfilePage() {
           </div>
         </motion.section>
 
-        {/* ── Stats ─────────────────────────────────────────────── */}
+        {/* â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section variants={itemVariants} className="mt-6 lg:mt-8">
           <h2 className="font-display text-lg font-extrabold tracking-tight">
             {t.profile.statsSection}
@@ -253,7 +253,7 @@ export default function ProfilePage() {
           </div>
         </motion.section>
 
-        {/* ── Learning profile ──────────────────────────────────── */}
+        {/* â”€â”€ Learning profile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section variants={itemVariants} className="mt-6 lg:mt-8">
           <h2 className="font-display text-lg font-extrabold tracking-tight">
             {t.profile.learningSection}

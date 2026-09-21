@@ -190,14 +190,14 @@ export default function OnboardingPage() {
                 : step === 6
                   ? focusEnemy !== ""
                   : step === 7
-                    ? true // workType slider — always valid
+                    ? true // workType slider â€” always valid
                     : step === 8
-                      ? true // memory slider — always valid
+                      ? true // memory slider â€” always valid
                       : step === 9
-                        ? true // learningStyle slider — always valid
+                        ? true // learningStyle slider â€” always valid
                         : step === 10
                           ? graspMethod !== ""
-                          : ambition >= 1; // step 11 — always valid
+                          : ambition >= 1; // step 11 â€” always valid
 
   const toggleInterest = (id: string) =>
     setInterests((prev) =>
@@ -1139,7 +1139,7 @@ export default function OnboardingPage() {
                 {ob.goalOptions.map((g) => (
                   <OptionCard
                     key={g.minutes}
-                    emoji="⏱️"
+                    emoji="â±ï¸"
                     label={g.label}
                     description={g.desc}
                     selected={dailyGoal === g.minutes}
@@ -1183,13 +1183,13 @@ export default function OnboardingPage() {
                 onChange={setWorkType}
                 leftLabel={ob.workTypeLeft}
                 rightLabel={ob.workTypeRight}
-                leftEmoji="⚡"
-                rightEmoji="🎯"
+                leftEmoji="âš¡"
+                rightEmoji="ðŸŽ¯"
                 centerEmojis={[
-                  { max: 25, emoji: "🏃" },
-                  { max: 50, emoji: "🤹" },
-                  { max: 75, emoji: "🤝" },
-                  { max: 100, emoji: "🎯" },
+                  { max: 25, emoji: "ðŸƒ" },
+                  { max: 50, emoji: "ðŸ¤¹" },
+                  { max: 75, emoji: "ðŸ¤" },
+                  { max: 100, emoji: "ðŸŽ¯" },
                 ]}
               />
             </OnboardingStep>
@@ -1207,13 +1207,13 @@ export default function OnboardingPage() {
                 onChange={setMemory}
                 leftLabel={ob.memoryLeft}
                 rightLabel={ob.memoryRight}
-                leftEmoji="🔍"
-                rightEmoji="🧩"
+                leftEmoji="ðŸ”"
+                rightEmoji="ðŸ§©"
                 centerEmojis={[
-                  { max: 25, emoji: "📋" },
-                  { max: 50, emoji: "📝" },
-                  { max: 75, emoji: "🧠" },
-                  { max: 100, emoji: "🧩" },
+                  { max: 25, emoji: "ðŸ“‹" },
+                  { max: 50, emoji: "ðŸ“" },
+                  { max: 75, emoji: "ðŸ§ " },
+                  { max: 100, emoji: "ðŸ§©" },
                 ]}
               />
             </OnboardingStep>
@@ -1231,13 +1231,13 @@ export default function OnboardingPage() {
                 onChange={setLearningStyle}
                 leftLabel={ob.styleLeft}
                 rightLabel={ob.styleRight}
-                leftEmoji="📖"
-                rightEmoji="🛠️"
+                leftEmoji="ðŸ“–"
+                rightEmoji="ðŸ› ï¸"
                 centerEmojis={[
-                  { max: 25, emoji: "📖" },
-                  { max: 50, emoji: "👀" },
-                  { max: 75, emoji: "👂" },
-                  { max: 100, emoji: "🛠️" },
+                  { max: 25, emoji: "ðŸ“–" },
+                  { max: 50, emoji: "ðŸ‘€" },
+                  { max: 75, emoji: "ðŸ‘‚" },
+                  { max: 100, emoji: "ðŸ› ï¸" },
                 ]}
               />
             </OnboardingStep>
@@ -1290,7 +1290,7 @@ export default function OnboardingPage() {
                   )}
                   {selectedGoal && (
                     <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/25 px-3 py-1.5 text-amber-400">
-                      ⏱️ {selectedGoal.minutes} {ob.summaryMinutes}
+                      â±ï¸ {selectedGoal.minutes} {ob.summaryMinutes}
                     </span>
                   )}
                   {reason && (
@@ -1318,7 +1318,7 @@ export default function OnboardingPage() {
                     </span>
                   )}
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1.5 text-gold">
-                    🚀 {ambition}/10
+                    ðŸš€ {ambition}/10
                   </span>
                 </div>
               </div>

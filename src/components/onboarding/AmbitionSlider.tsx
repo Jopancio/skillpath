@@ -8,11 +8,11 @@ import { cn } from "@/lib/utils";
  * giving playful feedback. Uses the localized `labels` array (6 buckets).
  */
 const BUCKETS: { max: number; emoji: string }[] = [
-  { max: 2, emoji: "🛋️" }, // 1-2 chill
-  { max: 4, emoji: "🙂" }, // 3-4 calm
-  { max: 6, emoji: "😊" }, // 5-6 steady
-  { max: 8, emoji: "🔥" }, // 7-8 eager/ambitious
-  { max: 10, emoji: "🚀" }, // 9-10 very ambitious
+  { max: 2, emoji: "ðŸ›‹ï¸" }, // 1-2 chill
+  { max: 4, emoji: "ðŸ™‚" }, // 3-4 calm
+  { max: 6, emoji: "ðŸ˜Š" }, // 5-6 steady
+  { max: 8, emoji: "ðŸ”¥" }, // 7-8 eager/ambitious
+  { max: 10, emoji: "ðŸš€" }, // 9-10 very ambitious
 ];
 
 function bucketFor(value: number) {

@@ -40,7 +40,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
       }
     }
     // Signed-in users who haven't finished onboarding must stay in the
-    // wizard — any other route bounces back to /onboarding.
+    // wizard â€” any other route bounces back to /onboarding.
     if (
       user &&
       hydrated &&

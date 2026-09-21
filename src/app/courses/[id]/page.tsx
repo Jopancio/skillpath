@@ -2,7 +2,7 @@ import { getCourse } from "@/data/courses";
 import { CourseDetail } from "./CourseDetail";
 
 // AI-generated courses have client-side ids (ai-*), so unknown params must
-// still render instead of 404 — CourseDetail resolves them after hydration.
+// still render instead of 404 â€” CourseDetail resolves them after hydration.
 export const dynamicParams = true;
 
 export function generateStaticParams() {
@@ -20,7 +20,7 @@ export function generateStaticParams() {
 export default async function CoursePage(props: PageProps<"/courses/[id]">) {
   const { id } = await props.params;
   const course = getCourse(id) ?? {
-    // Placeholder shell — client swaps in the real AI course after hydration
+    // Placeholder shell â€” client swaps in the real AI course after hydration
     id,
     title: { id: "", en: "" },
     description: { id: "", en: "" },

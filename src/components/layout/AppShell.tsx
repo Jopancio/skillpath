@@ -10,6 +10,7 @@ import {
   Map,
   Settings,
   Zap,
+  BriefcaseBusiness,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/lib/auth";
@@ -21,7 +22,7 @@ import { cn } from "@/lib/utils";
  * Landing, login, onboarding, learn/quiz/certificate flows stay
  * sidebar-free so they keep their immersive full-width layouts.
  */
-const SHELL_ROUTES = ["/dashboard", "/courses", "/profile", "/settings"];
+const SHELL_ROUTES = ["/dashboard", "/courses", "/profile", "/settings", "/simulations"];
 
 /**
  * Course detail pages (/courses/[id]) render their own CourseToolsSidebar
@@ -65,6 +66,7 @@ function AppSidebar() {
   const links = [
     { href: "/dashboard", label: t.nav.dashboard, icon: LayoutDashboard },
     { href: "/courses", label: t.nav.courses, icon: Map },
+    { href: "/simulations", label: "Simulasi Kerja", icon: BriefcaseBusiness },
     { href: "/profile", label: t.nav.profile, icon: CircleUserRound },
     { href: "/settings", label: t.nav.settings, icon: Settings },
   ];
@@ -102,7 +104,7 @@ function AppSidebar() {
         })}
       </nav>
 
-      {/* XP + streak chips — the streak is highlighted only on the dashboard */}
+      {/* XP + streak chips â€” the streak is highlighted only on the dashboard */}
       <AnimatePresence>
         {user && hydrated && (xp > 0 || streak > 0) && (
           <motion.div

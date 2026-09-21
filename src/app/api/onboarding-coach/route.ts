@@ -183,7 +183,7 @@ export async function POST(request: Request) {
   try {
     if (stage === "style") {
       const courses = cleanCourses(body?.courses);
-      // courses boleh kosong di sini — evaluasi gaya belajar tidak
+      // courses boleh kosong di sini â€” evaluasi gaya belajar tidak
       // bergantung pada course spesifik. Tapi profile wajib ada.
       if (!profile) {
         return NextResponse.json({ error: "invalid_body" }, { status: 400 });

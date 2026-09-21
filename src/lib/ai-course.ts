@@ -284,14 +284,14 @@ ${lines.join("\n")}
   // (upload missing OR text extraction failed) fall back to model knowledge.
   const pdfRules = hasPdfText
     ? `
-- PRIMARY SOURCE: the learner attached a reference PDF ("${pdf?.name}", quoted in full at the end of this prompt). Every module topic, lesson body, example, and quiz question MUST be based on what the PDF actually teaches — treat it as the source of truth, overriding your own knowledge whenever they differ.
+- PRIMARY SOURCE: the learner attached a reference PDF ("${pdf?.name}", quoted in full at the end of this prompt). Every module topic, lesson body, example, and quiz question MUST be based on what the PDF actually teaches â€” treat it as the source of truth, overriding your own knowledge whenever they differ.
 - Map the 3 modules onto the PDF's own structure and keep its order: basic/opening chapters become early modules, advanced/closing chapters become later modules. Reuse the PDF's terminology, terms, and examples wherever possible.
 - Do NOT introduce topics that are absent from the PDF. If the PDF covers fewer than 9 distinct topics, cover each remaining topic in more depth instead of inventing new material.
 - Every quiz question must be answerable purely from the PDF content. Ignore promotional/irrelevant parts of the PDF.`
     : "";
 
   const structureRule = hasPdfText
-    ? "\n- Progression: mirror the PDF's own flow — fundamentals from its opening sections, core skills from the middle, practice/application from the closing sections."
+    ? "\n- Progression: mirror the PDF's own flow â€” fundamentals from its opening sections, core skills from the middle, practice/application from the closing sections."
     : "\n- Progression: module 1 fundamentals, module 2 core skills, module 3 practice & monetization/career.";
 
   const specificityRule = hasPdfText
@@ -307,7 +307,7 @@ NOTE: a reference PDF ("${pdf?.name}") was uploaded but no readable text could b
   const pdfSourceBlock = hasPdfText
     ? `
 
-REFERENCE MATERIAL — "${pdf?.name}". This is the primary source for ALL content requested above:
+REFERENCE MATERIAL â€” "${pdf?.name}". This is the primary source for ALL content requested above:
 --- PDF CONTENT START ---
 ${pdfText}
 --- PDF CONTENT END ---`
@@ -360,7 +360,7 @@ Rules:
 - Each quiz question has exactly 4 options and exactly one correct answer.
 - correctIndex is 0-based (0-3) and must vary across questions.
 ${specificityRule}
-- "title", "description", "salary", "demand", lesson "title", and quiz fields must be plain text — no markdown symbols (#, **, etc.). Markdown is allowed ONLY inside lesson "body".${personalizationRules}${pdfRules}
+- "title", "description", "salary", "demand", lesson "title", and quiz fields must be plain text â€” no markdown symbols (#, **, etc.). Markdown is allowed ONLY inside lesson "body".${personalizationRules}${pdfRules}
 - No videos, no external links, no placeholders.${pdfFallbackNote}${pdfSourceBlock}`;
 }
 
@@ -375,7 +375,7 @@ export function extractJSON(text: string): GeneratedCourseJSON {
 }
 
 function loc(text: string): { id: string; en: string } {
-  // Strip markdown artifacts — titles/descriptions must be plain text
+  // Strip markdown artifacts â€” titles/descriptions must be plain text
   const t = String(text ?? "")
     .replace(/^#+\s*/, "")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
@@ -394,7 +394,10 @@ export function slugify(text: string): string {
     text
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[̀-ͯ]/g, "")
+      // Remove combining diacritical marks after NFD normalization. Keep the
+      // range escaped so bundlers and Windows source encodings cannot corrupt
+      // the Unicode character class.
+      .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "")
       .slice(0, 40) || "skill"
@@ -502,9 +505,9 @@ export function sanitizeCourse(
 /* ================== multi-phase generation (12-15 chapters) ==================
  * One call cannot emit 12-15 chapters with full lesson bodies + quizzes inside
  * the output-token budget, so generation is split:
- *   1. outline  — course meta + 12-15 chapter titles/summaries (1 call)
- *   2. content  — lessons + chapter quiz, a few chapters per call (N calls)
- *   3. final    — the end-of-course quiz (1 call)
+ *   1. outline  â€” course meta + 12-15 chapter titles/summaries (1 call)
+ *   2. content  â€” lessons + chapter quiz, a few chapters per call (N calls)
+ *   3. final    â€” the end-of-course quiz (1 call)
  * =========================================================================== */
 
 const TARGET_CHAPTERS = 12; // every course: exactly 12 phases
@@ -629,7 +632,7 @@ export function buildModuleContentPrompt(params: {
 
 Other writers handle the rest of the course. You write FULL content for EXACTLY the ${params.chapters.length} chapters listed under "WRITE CONTENT FOR THESE CHAPTERS ONLY".
 
-FULL course outline (context only — do NOT write these other chapters):
+FULL course outline (context only â€” do NOT write these other chapters):
 ${contextList}
 
 WRITE CONTENT FOR THESE CHAPTERS ONLY:
@@ -640,7 +643,7 @@ For EVERY listed chapter produce:
 2. A chapter quiz with EXACTLY ${MAX_CHAPTER_QUIZ} questions. Each question has exactly 4 options and one correct answer (correctIndex 0-3, must vary), plus a one-sentence explanation.
 ${
   hasPdfText
-    ? `Ground everything STRICTLY in the attached reference material quoted at the end of this prompt — use its terminology, steps, and examples; never contradict it.\n`
+    ? `Ground everything STRICTLY in the attached reference material quoted at the end of this prompt â€” use its terminology, steps, and examples; never contradict it.\n`
     : ""
 }
 Return ONLY a valid JSON object:
@@ -666,7 +669,7 @@ export function buildFinalQuizPrompt(params: {
   const pdfText = params.pdf?.text ?? "";
   const hasPdfText = pdfText.trim().length > 0;
   const contextList = params.chapters
-    .map((c, i) => `${i + 1}. ${c.title} — ${c.summary}`)
+    .map((c, i) => `${i + 1}. ${c.title} â€” ${c.summary}`)
     .join("\n");
 
   return `You are writing the FINAL end-of-course exam for the SkillPath course "${params.courseTitle}".
@@ -740,9 +743,9 @@ export function sanitizeOutline(raw: unknown): CourseOutline {
       title: `Pendalaman ${last.title}`,
       summary: `Pendalaman lanjutan dari materi ${last.title}.`,
       lessonTitles: [
-        `${base} — bagian ${n}`,
-        `Pendalaman ${base} — bagian ${n}`,
-        `Praktik ${base} — bagian ${n}`,
+        `${base} â€” bagian ${n}`,
+        `Pendalaman ${base} â€” bagian ${n}`,
+        `Praktik ${base} â€” bagian ${n}`,
       ],
     });
   }
@@ -851,7 +854,7 @@ export function sanitizeFinalQuiz(raw: unknown): DraftQuizQuestion[] {
 /**
  * Last-resort final exam assembled from the already-generated chapter quizzes
  * (one question per chapter, spread evenly). Only used when the dedicated
- * final-quiz call fails twice — the questions are real content of this course,
+ * final-quiz call fails twice â€” the questions are real content of this course,
  * so a finished multi-minute generation is not thrown away.
  */
 export function fallbackFinalQuiz(

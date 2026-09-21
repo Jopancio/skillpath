@@ -267,7 +267,7 @@ export const photography: Course = {
         id: "photography-m4-cq1",
         question: { id: "Sudut paling aman untuk memotret produk adalah...", en: "The safest angle for photographing products is..." },
         options: [
-          { id: "45° (atas dan samping terlihat)", en: "45° (top and side visible)" },
+          { id: "45Â° (atas dan samping terlihat)", en: "45Â° (top and side visible)" },
           { id: "Dari bawah", en: "From below" },
           { id: "Belakang produk", en: "Behind the product" },
           { id: "Sambil jongkok", en: "While squatting" },
@@ -373,7 +373,7 @@ export const photography: Course = {
                 },
               },
               {
-                front: { id: "Angle 45°", en: "45° Angle" },
+                front: { id: "Angle 45Â°", en: "45Â° Angle" },
                 back: {
                   id: "Sudut paling aman untuk produk: kelihatan atas dan samping. Eye-level untuk skincare, flat-lay untuk makanan.",
                   en: "The safest product angle: shows top and side. Eye-level for skincare, flat-lay for food.",
@@ -440,8 +440,8 @@ export const photography: Course = {
             duration: 6,
             xp: 25,
             body: {
-              id: "Edit foto produk langsung dari HP dengan **Lightroom Mobile** (gratis).\n\n**Resep edit produk:**\n1. Naikkan exposure sedikit (+0.3)\n2. White balance: putih harus netral\n3. Naikkan clarity/texture untuk detail\n4. Crop lurus — foto miring terlihat tidak profesional\n\n**Resep potret:**\n- Turunkan highlights, naikkan shadows (kulit lembut)\n- Sedikit vibrance, jangan saturasi berlebihan\n\nKonsistensi preset = ciri khas brand fotomu.",
-              en: "Edit product photos right on your phone with **Lightroom Mobile** (free).\n\n**Product edit recipe:**\n1. Raise exposure slightly (+0.3)\n2. White balance: whites must be neutral\n3. Raise clarity/texture for detail\n4. Straighten the crop — tilted photos look unprofessional\n\n**Portrait recipe:**\n- Lower highlights, raise shadows (soft skin)\n- Slight vibrance, don't oversaturate\n\nConsistent presets = your photo brand's signature.",
+              id: "Edit foto produk langsung dari HP dengan **Lightroom Mobile** (gratis).\n\n**Resep edit produk:**\n1. Naikkan exposure sedikit (+0.3)\n2. White balance: putih harus netral\n3. Naikkan clarity/texture untuk detail\n4. Crop lurus â€” foto miring terlihat tidak profesional\n\n**Resep potret:**\n- Turunkan highlights, naikkan shadows (kulit lembut)\n- Sedikit vibrance, jangan saturasi berlebihan\n\nKonsistensi preset = ciri khas brand fotomu.",
+              en: "Edit product photos right on your phone with **Lightroom Mobile** (free).\n\n**Product edit recipe:**\n1. Raise exposure slightly (+0.3)\n2. White balance: whites must be neutral\n3. Raise clarity/texture for detail\n4. Straighten the crop â€” tilted photos look unprofessional\n\n**Portrait recipe:**\n- Lower highlights, raise shadows (soft skin)\n- Slight vibrance, don't oversaturate\n\nConsistent presets = your photo brand's signature.",
             },
           },
         {
@@ -595,7 +595,7 @@ export const photography: Course = {
         id: "photography-m9-cq1",
         question: { id: "Sudut paling aman untuk memotret produk adalah...", en: "The safest angle for photographing products is..." },
         options: [
-          { id: "45° (atas dan samping terlihat)", en: "45° (top and side visible)" },
+          { id: "45Â° (atas dan samping terlihat)", en: "45Â° (top and side visible)" },
           { id: "Dari bawah", en: "From below" },
           { id: "Belakang produk", en: "Behind the product" },
           { id: "Sambil jongkok", en: "While squatting" },
@@ -626,8 +626,8 @@ export const photography: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Uji pemahamanmu tentang exposure, komposisi, dan cahaya dalam satu sesi foto terpadu.\n\n**Drill 1 sesi (60 menit):**\n1. Pilih 1 objek di rumah (gelas, sepatu, makanan)\n2. Foto objek yang sama dengan 3 setting exposure berbeda — rasakan bedanya\n3. Terapkan 3 teknik komposisi: rule of thirds, leading lines, negative space\n4. Ulangi di 2 kondisi cahaya: dekat jendela dan lampu meja\n\nKamu akan punya 12+ foto dari objek yang sama — lihat bagaimana setting mengubah hasil.\n\n## Latihan Praktis\nSelesaikan drillnya, pilih 3 foto terbaik, edit di HP, dan bandingkan before-after-nya.",
-          en: "Test your understanding of exposure, composition, and light in one integrated photo session.\n\n**1-session drill (60 minutes):**\n1. Pick 1 object at home (glass, shoe, food)\n2. Shoot the same object with 3 different exposure settings — feel the difference\n3. Apply 3 composition techniques: rule of thirds, leading lines, negative space\n4. Repeat in 2 light conditions: near a window and a desk lamp\n\nYou'll have 12+ photos of the same object — see how settings change results.\n\n## Practical Exercise\nFinish the drill, pick your 3 best photos, edit on your phone, and compare before-after.",
+          id: "Uji pemahamanmu tentang exposure, komposisi, dan cahaya dalam satu sesi foto terpadu.\n\n**Drill 1 sesi (60 menit):**\n1. Pilih 1 objek di rumah (gelas, sepatu, makanan)\n2. Foto objek yang sama dengan 3 setting exposure berbeda â€” rasakan bedanya\n3. Terapkan 3 teknik komposisi: rule of thirds, leading lines, negative space\n4. Ulangi di 2 kondisi cahaya: dekat jendela dan lampu meja\n\nKamu akan punya 12+ foto dari objek yang sama â€” lihat bagaimana setting mengubah hasil.\n\n## Latihan Praktis\nSelesaikan drillnya, pilih 3 foto terbaik, edit di HP, dan bandingkan before-after-nya.",
+          en: "Test your understanding of exposure, composition, and light in one integrated photo session.\n\n**1-session drill (60 minutes):**\n1. Pick 1 object at home (glass, shoe, food)\n2. Shoot the same object with 3 different exposure settings â€” feel the difference\n3. Apply 3 composition techniques: rule of thirds, leading lines, negative space\n4. Repeat in 2 light conditions: near a window and a desk lamp\n\nYou'll have 12+ photos of the same object â€” see how settings change results.\n\n## Practical Exercise\nFinish the drill, pick your 3 best photos, edit on your phone, and compare before-after.",
         },
         },
         {
@@ -691,8 +691,8 @@ export const photography: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Proyek nyata: buat **katalog 9 foto untuk 1 produk** (punya sendiri atau UMKM tetangga — gratis dulu tidak apa-apa).\n\n**Brief klien imajiner:**\n- 3 foto hero: produk terlihat jelas, cahaya terbaik\n- 3 foto detail: tekstur, bahan, kemasan\n- 3 foto lifestyle: produk dipakai dalam konteks nyata\n\nDeliverable: 9 foto teredit konsisten (tone warna seragam) dalam 1 folder rapi.\n\n## Latihan Praktis\nKerjakan proyeknya, kirim ke pemilik produk, dan minta testimoni tertulis — ini aset pertamamu untuk menawar klien berbayar.",
-          en: "A real project: create a **9-photo catalog for 1 product** (your own or a neighbor's SME — free first is fine).\n\n**Imaginary client brief:**\n- 3 hero shots: product clearly visible, best lighting\n- 3 detail shots: texture, material, packaging\n- 3 lifestyle shots: product used in real context\n\nDeliverable: 9 consistently edited photos (uniform color tone) in 1 tidy folder.\n\n## Practical Exercise\nDo the project, send it to the product owner, and ask for a written testimonial — this is your first asset for pitching paying clients.",
+          id: "Proyek nyata: buat **katalog 9 foto untuk 1 produk** (punya sendiri atau UMKM tetangga â€” gratis dulu tidak apa-apa).\n\n**Brief klien imajiner:**\n- 3 foto hero: produk terlihat jelas, cahaya terbaik\n- 3 foto detail: tekstur, bahan, kemasan\n- 3 foto lifestyle: produk dipakai dalam konteks nyata\n\nDeliverable: 9 foto teredit konsisten (tone warna seragam) dalam 1 folder rapi.\n\n## Latihan Praktis\nKerjakan proyeknya, kirim ke pemilik produk, dan minta testimoni tertulis â€” ini aset pertamamu untuk menawar klien berbayar.",
+          en: "A real project: create a **9-photo catalog for 1 product** (your own or a neighbor's SME â€” free first is fine).\n\n**Imaginary client brief:**\n- 3 hero shots: product clearly visible, best lighting\n- 3 detail shots: texture, material, packaging\n- 3 lifestyle shots: product used in real context\n\nDeliverable: 9 consistently edited photos (uniform color tone) in 1 tidy folder.\n\n## Practical Exercise\nDo the project, send it to the product owner, and ask for a written testimonial â€” this is your first asset for pitching paying clients.",
         },
         },
         {
@@ -756,8 +756,8 @@ export const photography: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Fotografer dinilai dari portofolio yang mudah dilihat. Waktunya merapikan milikmu.\n\n**Susun portofolio online (gratis):**\n- Pilih 15-20 foto terbaik saja — kualitas mengalahkan kuantitas\n- Kelompokkan per tema: produk, makanan, portrait\n- Tampilkan di Instagram khusus karya + link Google Drive/Behance\n\n**Paket jasa awal:** mulai dari Rp 150-300 ribu per sesi produk (9-15 foto), naikkan setelah 5 klien dengan testimoni.\n\n## Latihan Praktis\nRilis portofoliomu minggu ini dan tawarkan paket perdana ke 5 UMKM sekitar. Target: 1 klien berbayar pertama bulan ini.",
-          en: "Photographers are judged by an easy-to-view portfolio. Time to tidy yours up.\n\n**Build an online portfolio (free):**\n- Pick only your 15-20 best photos — quality beats quantity\n- Group by theme: product, food, portrait\n- Display on a dedicated work Instagram + Google Drive/Behance link\n\n**Starter service package:** start at IDR 150-300k per product session (9-15 photos), raise after 5 clients with testimonials.\n\n## Practical Exercise\nRelease your portfolio this week and offer your starter package to 5 nearby SMEs. Target: your first paying client this month.",
+          id: "Fotografer dinilai dari portofolio yang mudah dilihat. Waktunya merapikan milikmu.\n\n**Susun portofolio online (gratis):**\n- Pilih 15-20 foto terbaik saja â€” kualitas mengalahkan kuantitas\n- Kelompokkan per tema: produk, makanan, portrait\n- Tampilkan di Instagram khusus karya + link Google Drive/Behance\n\n**Paket jasa awal:** mulai dari Rp 150-300 ribu per sesi produk (9-15 foto), naikkan setelah 5 klien dengan testimoni.\n\n## Latihan Praktis\nRilis portofoliomu minggu ini dan tawarkan paket perdana ke 5 UMKM sekitar. Target: 1 klien berbayar pertama bulan ini.",
+          en: "Photographers are judged by an easy-to-view portfolio. Time to tidy yours up.\n\n**Build an online portfolio (free):**\n- Pick only your 15-20 best photos â€” quality beats quantity\n- Group by theme: product, food, portrait\n- Display on a dedicated work Instagram + Google Drive/Behance link\n\n**Starter service package:** start at IDR 150-300k per product session (9-15 photos), raise after 5 clients with testimonials.\n\n## Practical Exercise\nRelease your portfolio this week and offer your starter package to 5 nearby SMEs. Target: your first paying client this month.",
         },
         },
         {
@@ -794,7 +794,7 @@ export const photography: Course = {
           { id: "1 foto saja", en: "Just 1 photo" },
         ],
         correctIndex: 1,
-        explanation: { id: "Portofolio dinilai dari foto terlemahnya — sedikit tapi kuat lebih baik daripada banyak tapi campur.", en: "A portfolio is judged by its weakest photo — few but strong beats many but mixed." },
+        explanation: { id: "Portofolio dinilai dari foto terlemahnya â€” sedikit tapi kuat lebih baik daripada banyak tapi campur.", en: "A portfolio is judged by its weakest photo â€” few but strong beats many but mixed." },
       },
       {
         id: "photography-m12-cq2",
@@ -882,7 +882,7 @@ export const photography: Course = {
     id: "photography-q7",
     question: { id: "Sudut paling aman untuk memotret produk adalah...", en: "The safest angle for photographing products is..." },
     options: [
-      { id: "45° (atas dan samping terlihat)", en: "45° (top and side visible)" },
+      { id: "45Â° (atas dan samping terlihat)", en: "45Â° (top and side visible)" },
       { id: "Dari bawah", en: "From below" },
       { id: "Belakang produk", en: "Behind the product" },
       { id: "Sambil jongkok", en: "While squatting" },

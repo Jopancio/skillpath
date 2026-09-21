@@ -235,8 +235,8 @@ export const videoEditor: Course = {
             duration: 7,
             xp: 25,
             body: {
-              id: "**Color correction** = memperbaiki warna agar natural (exposure, white balance).\n**Color grading** = memberi style/mood (hangat, dingin, sinematik).\n\n**Urutan kerja benar:** correct dulu, baru grade.\n\n**Tips cepat:**\n- Exposure: jangan ada area putih/hitam total\n- White balance: putih harus benar-benar putih\n- Gunakan **LUT** (preset warna) untuk grading cepat\n\nVideo flat/LOG memang terlihat pudar — itu normal, dirancang untuk di-grade.",
-              en: "**Color correction** = fixing colors to look natural (exposure, white balance).\n**Color grading** = adding style/mood (warm, cold, cinematic).\n\n**Correct workflow:** correct first, then grade.\n\n**Quick tips:**\n- Exposure: no fully white/black areas\n- White balance: whites must be truly white\n- Use **LUTs** (color presets) for fast grading\n\nFlat/LOG video looks washed out on purpose — it's designed for grading.",
+              id: "**Color correction** = memperbaiki warna agar natural (exposure, white balance).\n**Color grading** = memberi style/mood (hangat, dingin, sinematik).\n\n**Urutan kerja benar:** correct dulu, baru grade.\n\n**Tips cepat:**\n- Exposure: jangan ada area putih/hitam total\n- White balance: putih harus benar-benar putih\n- Gunakan **LUT** (preset warna) untuk grading cepat\n\nVideo flat/LOG memang terlihat pudar â€” itu normal, dirancang untuk di-grade.",
+              en: "**Color correction** = fixing colors to look natural (exposure, white balance).\n**Color grading** = adding style/mood (warm, cold, cinematic).\n\n**Correct workflow:** correct first, then grade.\n\n**Quick tips:**\n- Exposure: no fully white/black areas\n- White balance: whites must be truly white\n- Use **LUTs** (color presets) for fast grading\n\nFlat/LOG video looks washed out on purpose â€” it's designed for grading.",
             },
           },
         {
@@ -607,8 +607,8 @@ export const videoEditor: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Uji semua skill dasarmu — cutting, color, audio, motion — dalam satu video pendek.\n\n**Drill video 60 detik:**\n1. Ambil footage HP-mu sendiri (atau footage gratis Pexels)\n2. Cutting rapat: buang semua jeda mati, maksimal 60 detik\n3. Color correction dulu (white balance, exposure), baru grading sinematik tipis\n4. Audio: rapikan suara, tambah musik di -18 dB di bawah voice\n5. Tutup dengan 1 animasi teks sederhana sebagai judul\n\nSatu video ini merangkum seluruh jalur belajarmu.\n\n## Latihan Praktis\nSelesaikan drillnya dan minta 3 orang menonton tanpa konteks — tanya di bagian mana mereka bosan. Itu titik perbaikanmu.",
-          en: "Test all your basic skills — cutting, color, audio, motion — in one short video.\n\n**60-second video drill:**\n1. Use your own phone footage (or free Pexels footage)\n2. Tight cutting: remove all dead air, maximum 60 seconds\n3. Color correct first (white balance, exposure), then light cinematic grading\n4. Audio: clean up sound, add music at -18 dB below voice\n5. Close with 1 simple text animation as the title\n\nThis one video summarizes your entire learning path.\n\n## Practical Exercise\nFinish the drill and ask 3 people to watch without context — ask where they got bored. That's your improvement point.",
+          id: "Uji semua skill dasarmu â€” cutting, color, audio, motion â€” dalam satu video pendek.\n\n**Drill video 60 detik:**\n1. Ambil footage HP-mu sendiri (atau footage gratis Pexels)\n2. Cutting rapat: buang semua jeda mati, maksimal 60 detik\n3. Color correction dulu (white balance, exposure), baru grading sinematik tipis\n4. Audio: rapikan suara, tambah musik di -18 dB di bawah voice\n5. Tutup dengan 1 animasi teks sederhana sebagai judul\n\nSatu video ini merangkum seluruh jalur belajarmu.\n\n## Latihan Praktis\nSelesaikan drillnya dan minta 3 orang menonton tanpa konteks â€” tanya di bagian mana mereka bosan. Itu titik perbaikanmu.",
+          en: "Test all your basic skills â€” cutting, color, audio, motion â€” in one short video.\n\n**60-second video drill:**\n1. Use your own phone footage (or free Pexels footage)\n2. Tight cutting: remove all dead air, maximum 60 seconds\n3. Color correct first (white balance, exposure), then light cinematic grading\n4. Audio: clean up sound, add music at -18 dB below voice\n5. Close with 1 simple text animation as the title\n\nThis one video summarizes your entire learning path.\n\n## Practical Exercise\nFinish the drill and ask 3 people to watch without context â€” ask where they got bored. That's your improvement point.",
         },
         },
         {
@@ -672,8 +672,8 @@ export const videoEditor: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Simulasikan pekerjaan klien nyata dari brief sampai revisi.\n\n**Brief imajiner:** bisnis lokal butuh video promosi 30-45 detik untuk Instagram.\n\n**Alur kerja profesional:**\n1. Brief: tulis 3 tujuan video & target penonton\n2. Rough cut: struktur tanpa efek — minta 'klien' (teman) review\n3. Fine cut: color, audio, motion graphics\n4. Revisi 1x: catat semua masukan, kerjakan tanpa debat\n5. Deliver: export 1080p + file project rapi\n\nMengerjakan revisi dengan tenang adalah skill klien yang paling mahal harganya.\n\n## Latihan Praktis\nJalankan seluruh alurnya dan catat berapa lama tiap tahap — ini dasar perhitungan harga jasamu nanti.",
-          en: "Simulate real client work from brief to revision.\n\n**Imaginary brief:** a local business needs a 30-45 second promo video for Instagram.\n\n**Professional workflow:**\n1. Brief: write 3 video goals & target audience\n2. Rough cut: structure without effects — have the 'client' (a friend) review\n3. Fine cut: color, audio, motion graphics\n4. 1 revision round: note all input, execute without arguing\n5. Deliver: 1080p export + tidy project files\n\nHandling revisions calmly is the most expensive client skill.\n\n## Practical Exercise\nRun the entire workflow and record how long each stage takes — this becomes the basis for calculating your service pricing.",
+          id: "Simulasikan pekerjaan klien nyata dari brief sampai revisi.\n\n**Brief imajiner:** bisnis lokal butuh video promosi 30-45 detik untuk Instagram.\n\n**Alur kerja profesional:**\n1. Brief: tulis 3 tujuan video & target penonton\n2. Rough cut: struktur tanpa efek â€” minta 'klien' (teman) review\n3. Fine cut: color, audio, motion graphics\n4. Revisi 1x: catat semua masukan, kerjakan tanpa debat\n5. Deliver: export 1080p + file project rapi\n\nMengerjakan revisi dengan tenang adalah skill klien yang paling mahal harganya.\n\n## Latihan Praktis\nJalankan seluruh alurnya dan catat berapa lama tiap tahap â€” ini dasar perhitungan harga jasamu nanti.",
+          en: "Simulate real client work from brief to revision.\n\n**Imaginary brief:** a local business needs a 30-45 second promo video for Instagram.\n\n**Professional workflow:**\n1. Brief: write 3 video goals & target audience\n2. Rough cut: structure without effects â€” have the 'client' (a friend) review\n3. Fine cut: color, audio, motion graphics\n4. 1 revision round: note all input, execute without arguing\n5. Deliver: 1080p export + tidy project files\n\nHandling revisions calmly is the most expensive client skill.\n\n## Practical Exercise\nRun the entire workflow and record how long each stage takes â€” this becomes the basis for calculating your service pricing.",
         },
         },
         {
@@ -710,7 +710,7 @@ export const videoEditor: Course = {
           { id: "Supaya cepat selesai", en: "To finish quickly" },
         ],
         correctIndex: 1,
-        explanation: { id: "Mengubah struktur setelah efek selesai membuang berjam-jam kerja — validasi struktur di awal.", en: "Changing structure after effects are done wastes hours of work — validate structure early." },
+        explanation: { id: "Mengubah struktur setelah efek selesai membuang berjam-jam kerja â€” validasi struktur di awal.", en: "Changing structure after effects are done wastes hours of work â€” validate structure early." },
       },
       {
         id: "videoEditor-m11-cq2",
@@ -737,8 +737,8 @@ export const videoEditor: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Waktunya menetapkan harga dan berburu klien nyata.\n\n**Patokan harga pemula (pasar Indonesia):**\n- Video reels/TikTok 30-60 dtk: Rp 150-400 ribu\n- Video promosi 1-3 menit: Rp 500 ribu - 1,5 juta\n- Paket bulanan 8-12 video pendek: Rp 1,5-4 juta\n\n**Cara mencari klien pertama:** tawarkan ke kreator UMKM yang videonya masih seadanya, lampirkan 1 contoh edit ulang 15 detik dari video mereka — bukti langsung mengalahkan seribu kata promosi.\n\n## Latihan Praktis\nBuat rate card 3 paket, pilih 5 calon klien, edit ulang 15 detik video salah satu video mereka sebagai contoh, dan kirim penawaranmu minggu ini.",
-          en: "Time to set your price and hunt real clients.\n\n**Beginner pricing benchmarks (Indonesian market):**\n- Reels/TikTok video 30-60s: IDR 150-400k\n- Promo video 1-3 minutes: IDR 500k - 1.5 million\n- Monthly package 8-12 short videos: IDR 1.5-4 million\n\n**Finding your first client:** approach SME creators whose videos are still basic, attach a 15-second re-edit sample of their own video — direct proof beats a thousand words of promotion.\n\n## Practical Exercise\nMake a 3-package rate card, pick 5 prospective clients, re-edit 15 seconds of one of their videos as a sample, and send your offer this week.",
+          id: "Waktunya menetapkan harga dan berburu klien nyata.\n\n**Patokan harga pemula (pasar Indonesia):**\n- Video reels/TikTok 30-60 dtk: Rp 150-400 ribu\n- Video promosi 1-3 menit: Rp 500 ribu - 1,5 juta\n- Paket bulanan 8-12 video pendek: Rp 1,5-4 juta\n\n**Cara mencari klien pertama:** tawarkan ke kreator UMKM yang videonya masih seadanya, lampirkan 1 contoh edit ulang 15 detik dari video mereka â€” bukti langsung mengalahkan seribu kata promosi.\n\n## Latihan Praktis\nBuat rate card 3 paket, pilih 5 calon klien, edit ulang 15 detik video salah satu video mereka sebagai contoh, dan kirim penawaranmu minggu ini.",
+          en: "Time to set your price and hunt real clients.\n\n**Beginner pricing benchmarks (Indonesian market):**\n- Reels/TikTok video 30-60s: IDR 150-400k\n- Promo video 1-3 minutes: IDR 500k - 1.5 million\n- Monthly package 8-12 short videos: IDR 1.5-4 million\n\n**Finding your first client:** approach SME creators whose videos are still basic, attach a 15-second re-edit sample of their own video â€” direct proof beats a thousand words of promotion.\n\n## Practical Exercise\nMake a 3-package rate card, pick 5 prospective clients, re-edit 15 seconds of one of their videos as a sample, and send your offer this week.",
         },
         },
         {
@@ -775,7 +775,7 @@ export const videoEditor: Course = {
           { id: "Bercerita soal alat mahal", en: "Talking about expensive gear" },
         ],
         correctIndex: 1,
-        explanation: { id: "Klien langsung melihat hasil pada kontennya sendiri — bukti konkret mengalahkan janji.", en: "The client directly sees results on their own content — concrete proof beats promises." },
+        explanation: { id: "Klien langsung melihat hasil pada kontennya sendiri â€” bukti konkret mengalahkan janji.", en: "The client directly sees results on their own content â€” concrete proof beats promises." },
       },
       {
         id: "videoEditor-m12-cq2",

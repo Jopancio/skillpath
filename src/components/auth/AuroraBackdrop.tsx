@@ -4,7 +4,7 @@ import { Sparkles, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /* ============================================================ */
-/*  AuroraBackdrop — static login background                     */
+/*  AuroraBackdrop â€” static login background                     */
 /*                                                               */
 /*  Three aurora blobs + a fading dot grid + sparkles.           */
 /*  Purely decorative (aria-hidden), no animation.               */

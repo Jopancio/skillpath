@@ -55,7 +55,7 @@ export interface PlacementResult {
 }
 
 /**
- * Hasil evaluasi gaya belajar — dihasilkan dari jawaban personalisasi
+ * Hasil evaluasi gaya belajar â€” dihasilkan dari jawaban personalisasi
  * (langkah 7-12) SEBELUM quiz diagnostik. Menjelaskan gaya belajar
  * dominan user, karakteristik, cara materi disesuaikan, dan yang perlu
  * dijaga. Semua teks dalam Bahasa Indonesia.
@@ -77,7 +77,7 @@ export interface CoachCourse {
 const QUIZ_ID = "ai-placement";
 
 function loc(text: string): { id: string; en: string } {
-  // Strip markdown artifacts — questions/options must be plain text
+  // Strip markdown artifacts â€” questions/options must be plain text
   const t = String(text ?? "")
     .replace(/^#+\s*/, "")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
@@ -92,7 +92,7 @@ function profileBlock(
 ): string {
   const lines = describeProfile(profile, locale);
   for (const c of clarifications) {
-    lines.push(`- ${c.question} → ${c.answer}`);
+    lines.push(`- ${c.question} â†’ ${c.answer}`);
   }
   return lines.length > 0
     ? `\nLearner profile:\n${lines.join("\n")}\n`
@@ -100,7 +100,7 @@ function profileBlock(
 }
 
 function courseBlock(courses: CoachCourse[]): string {
-  const list = courses.map((c) => `- id: "${c.id}" — ${c.title}`).join("\n");
+  const list = courses.map((c) => `- id: "${c.id}" â€” ${c.title}`).join("\n");
   return `\nThe learner is interested in these skills:\n${list}\n`;
 }
 
@@ -119,7 +119,7 @@ export function buildEvaluatePrompt(
   const clarificationBlock =
     clarifications.length > 0
       ? `
-The learner already answered your previous clarifying question(s). You MUST NOT ask again unless something critical is still missing — respond with type "ok".`
+The learner already answered your previous clarifying question(s). You MUST NOT ask again unless something critical is still missing â€” respond with type "ok".`
       : `
 If (and only if) a critical piece of information is missing or ambiguous and would significantly change the diagnostic quiz, respond with type "clarify" and ask ONE short question with 2-4 short answer options. Otherwise respond with type "ok".`;
 
@@ -174,7 +174,7 @@ Rules:
 - courseId MUST be copied exactly from the provided skill list.
 - "plan" is a personalized roadmap for the chosen skill: exactly 5 steps ordered from first to last (like a journey from zero to ready), each step building on the previous one. Adapt the pace to the learner's daily study time and starting knowledge.
 - "materials": 5-7 short phrases of the key topics they will learn.${clarificationBlock}
-- No markdown, no code fences, no commentary — JSON only.`;
+- No markdown, no code fences, no commentary â€” JSON only.`;
 }
 
 export function sanitizeEvaluateResult(
@@ -227,7 +227,7 @@ export function sanitizeEvaluateResult(
     };
   });
 
-  // Learning plan (optional but expected) — sanitize defensively
+  // Learning plan (optional but expected) â€” sanitize defensively
   const planRaw = (data?.plan ?? {}) as Record<string, unknown>;
   const rawSteps = Array.isArray(planRaw.steps)
     ? (planRaw.steps as Record<string, unknown>[])
@@ -270,7 +270,7 @@ export function buildResultPrompt(
   const qaLines = qa
     .map(
       (item, i) =>
-        `${i + 1}. ${item.question} — ${item.correct ? (en ? "CORRECT" : "BENAR") : en ? "WRONG" : "SALAH"}`
+        `${i + 1}. ${item.question} â€” ${item.correct ? (en ? "CORRECT" : "BENAR") : en ? "WRONG" : "SALAH"}`
     )
     .join("\n");
 
@@ -293,7 +293,7 @@ Rules:
 - level: beginner = mostly wrong, intermediate = mixed, advanced = mostly correct.
 - strengths: list topics from questions they answered correctly (empty array if none).
 - tips: exactly 3, concrete and specific to "${courseTitle}".
-- No markdown, no code fences — JSON only.`;
+- No markdown, no code fences â€” JSON only.`;
 }
 
 export function sanitizePlacementResult(
@@ -328,7 +328,7 @@ export function sanitizePlacementResult(
 /**
  * Membangun prompt untuk mengevaluasi gaya belajar user berdasarkan
  * jawaban personalisasi (langkah 7-12). Tidak bergantung pada course
- * spesifik — fokusnya pada CARA user belajar, bukan APA yang dipelajari.
+ * spesifik â€” fokusnya pada CARA user belajar, bukan APA yang dipelajari.
  */
 export function buildLearningStylePrompt(
   profile: CourseProfile | undefined,
@@ -357,12 +357,12 @@ ${profileBlock}${courseBlock}
 Your task: evaluate this learner's learning style based on their personalization answers, then explain how the AI will adapt the material for them.
 
 Pay special attention to:
-- workType (0=speed, 100=accuracy) — working style
-- memory (0=forgets details, 100=struggles with big concepts) — memory weakness
-- learningStyle (0=theory first, 100=straight to practice) — learning preference
-- graspMethod — fastest way to grasp complex material
-- focusEnemy — main focus distraction
-- ambition (1-10) — ambition level
+- workType (0=speed, 100=accuracy) â€” working style
+- memory (0=forgets details, 100=struggles with big concepts) â€” memory weakness
+- learningStyle (0=theory first, 100=straight to practice) â€” learning preference
+- graspMethod â€” fastest way to grasp complex material
+- focusEnemy â€” main focus distraction
+- ambition (1-10) â€” ambition level
 
 Determine a short, catchy "styleType" (2-3 words, e.g. "Visual Practitioner", "Systematic Thinker", "Fast Explorer") plus 1 emoji that represents it.
 
@@ -381,7 +381,7 @@ Rules:
 - traits: 3-4 short items about how they learn/work.
 - adaptations: 3-4 concrete items about how the material will be adapted (e.g. "lots of diagrams", "short step breakdowns", "light quizzes after concepts").
 - challenges: 2-3 items that might hinder them (based on focusEnemy & memory weakness).
-- No markdown, no code fences — JSON only.`;
+- No markdown, no code fences â€” JSON only.`;
   }
 
   return `Kamu adalah pelatih belajar di SkillPath, aplikasi belajar skill nonformal.
@@ -389,12 +389,12 @@ ${profileBlock}${courseBlock}
 Tugasmu: evaluasi gaya belajar pembelajar ini berdasarkan jawaban personalisasinya, lalu jelaskan bagaimana AI akan menyesuaikan materi buat dia.
 
 Perhatikan khususnya:
-- workType (0=kecepatan, 100=ketelitian) — gaya bekerja
-- memory (0=lupa detail, 100=susah konsep besar) — kelemahan memori
-- learningStyle (0=teori dulu, 100=langsung praktik) — preferensi belajar
-- graspMethod — cara tercepat paham materi rumit
-- focusEnemy — gangguan fokus utama
-- ambition (1-10) — tingkat ambisi
+- workType (0=kecepatan, 100=ketelitian) â€” gaya bekerja
+- memory (0=lupa detail, 100=susah konsep besar) â€” kelemahan memori
+- learningStyle (0=teori dulu, 100=langsung praktik) â€” preferensi belajar
+- graspMethod â€” cara tercepat paham materi rumit
+- focusEnemy â€” gangguan fokus utama
+- ambition (1-10) â€” tingkat ambisi
 
 Tentukan "styleType" yang singkat dan mencolok (2-3 kata, mis. "Praktisi Visual", "Pemikir Sistematis", "Eksplorator Cepat") beserta 1 emoji yang mewakili.
 
@@ -413,7 +413,7 @@ Aturan:
 - traits: 3-4 butir pendek tentang bagaimana cara mereka belajar/kerja.
 - adaptations: 3-4 butir konkret tentang bagaimana materi akan disesuaikan (mis. "banyak diagram", "breakdown langkah pendek", "kuis ringan setelah konsep").
 - challenges: 2-3 butir hal yang mungkin menghambat (berdasarkan focusEnemy & kelemahan memori).
-- Tanpa markdown, tanpa code fence — JSON saja.`;
+- Tanpa markdown, tanpa code fence â€” JSON saja.`;
 }
 
 /** Membersihkan output AI untuk LearningStyleResult. */
@@ -434,15 +434,15 @@ export function sanitizeLearningStyleResult(
   )
     .trim()
     .slice(0, 60);
-  let styleEmoji = String(data?.styleEmoji ?? "🎯").trim();
+  let styleEmoji = String(data?.styleEmoji ?? "ðŸŽ¯").trim();
   // Ambil satu grapheme pertama (jaga-jaga AI ngasih banyak emoji).
   // Heuristik aman untuk ES2017: emoji umumnya bukan ASCII printable.
   if (styleEmoji) {
     const first = Array.from(styleEmoji)[0] ?? "";
     const cp = first.codePointAt(0) ?? 0;
-    styleEmoji = cp > 0x255 ? first : "🎯";
+    styleEmoji = cp > 0x255 ? first : "ðŸŽ¯";
   } else {
-    styleEmoji = "🎯";
+    styleEmoji = "ðŸŽ¯";
   }
 
   return {
@@ -451,8 +451,8 @@ export function sanitizeLearningStyleResult(
     summary:
       String(data?.summary ?? "").trim().slice(0, 280) ||
       (en
-        ? "Your learning style is unique — the AI will adapt the material to your needs."
-        : "Gaya belajarmu unik — AI akan menyesuaikan materi sesuai kebutuhanmu."),
+        ? "Your learning style is unique â€” the AI will adapt the material to your needs."
+        : "Gaya belajarmu unik â€” AI akan menyesuaikan materi sesuai kebutuhanmu."),
     traits: toArray(data?.traits, 5),
     adaptations: toArray(data?.adaptations, 5),
     challenges: toArray(data?.challenges, 4),

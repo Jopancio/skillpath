@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 const Strands = dynamic(() => import("./Strands"), { ssr: false });
 
 /** Orange-gold palette matching the site theme */
-const THEME_COLORS = ["#FF6B2C", "#F4B942", "#D94A16"];
+const THEME_COLORS = ["#2563EB", "#38BDF8", "#1D4ED8"];
 
 interface AIThinkingLoaderProps {
   /** Title shown under the animation, e.g. "AI sedang mengevaluasi..." */
@@ -31,7 +31,7 @@ export function AIThinkingLoader({
 }: AIThinkingLoaderProps) {
   return (
     <div className="flex w-full flex-col items-center justify-center text-center">
-      {/* Strands animation — clean, no overlay */}
+      {/* Strands animation â€” clean, no overlay */}
       <div
         className="relative w-full max-w-xl overflow-hidden rounded-3xl border border-border/60 bg-card/40"
         style={{ height: compact ? 140 : height }}

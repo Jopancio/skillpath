@@ -209,11 +209,11 @@ MagneticButton.displayName = "MagneticButton";
 // -------------------------------------------------------------------------
 const MarqueeItem = () => (
   <div className="flex items-center space-x-12 px-6">
-    <span>Belajar Skill Nyata</span> <span className="text-primary/60">✦</span>
-    <span>XP &amp; Streak</span> <span className="text-gold/60">✦</span>
-    <span>Kuis &amp; Sertifikat</span> <span className="text-primary/60">✦</span>
-    <span>Jalur Belajar Terarah</span> <span className="text-gold/60">✦</span>
-    <span>Langsung Siap Kerja</span> <span className="text-primary/60">✦</span>
+    <span>Belajar Skill Nyata</span> <span className="text-primary/60">âœ¦</span>
+    <span>XP &amp; Streak</span> <span className="text-gold/60">âœ¦</span>
+    <span>Kuis &amp; Sertifikat</span> <span className="text-primary/60">âœ¦</span>
+    <span>Jalur Belajar Terarah</span> <span className="text-gold/60">âœ¦</span>
+    <span>Langsung Siap Kerja</span> <span className="text-primary/60">âœ¦</span>
   </div>
 );
 
@@ -222,7 +222,7 @@ function scrollToTop() {
 }
 
 /** Footer body shared by the desktop "curtain reveal" and the mobile
- *  static variant — content only, no reveal trickery. */
+ *  static variant â€” content only, no reveal trickery. */
 function FooterContent({ startHref, ctaLabel }: { startHref: string; ctaLabel: string }) {
   const year = new Date().getFullYear();
 
@@ -303,7 +303,7 @@ function FooterContent({ startHref, ctaLabel }: { startHref: string; ctaLabel: s
       <div className="relative z-20 flex w-full flex-col items-center justify-between gap-6 px-6 pb-8 md:flex-row md:px-12">
         {/* Copyright */}
         <div className="order-2 text-[10px] font-semibold uppercase tracking-widest text-muted md:order-1 md:text-xs">
-          © {year} SkillPath. Semua hak dilindungi.
+          Â© {year} SkillPath. Semua hak dilindungi.
         </div>
 
         {/* Brand Badge */}
@@ -404,7 +404,7 @@ export function CinematicFooter({ startHref, ctaLabel }: CinematicFooterProps) {
     <>
       <style dangerouslySetInnerHTML={{ __html: STYLES }} />
 
-      {/* Mobile / touch: static footer — a fixed full-viewport reveal would
+      {/* Mobile / touch: static footer â€” a fixed full-viewport reveal would
           trap small screens and hide the bottom bar. */}
       <footer className="cinematic-footer-wrapper relative flex min-h-[92vh] w-full flex-col justify-between overflow-hidden bg-background text-foreground md:hidden">
         <FooterContent startHref={startHref} ctaLabel={ctaLabel} />

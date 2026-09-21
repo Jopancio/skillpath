@@ -10,8 +10,8 @@ import { Button } from "@/components/ui/button";
 type Phase = "celebrate" | "exiting";
 
 const CONFETTI_COLORS = [
-  "#FF6B2C", // primary
-  "#F4B942", // gold
+  "#2563EB", // primary
+  "#38BDF8", // gold
   "#7C5CFC", // accent-2 / purple-ish
   "#34D399", // success-ish
   "#60A5FA", // blue
@@ -103,7 +103,7 @@ export function SignUpSuccess({
         transitioned = true;
       }
     } catch {
-      // Fall through — never let the transition swallow the navigation.
+      // Fall through â€” never let the transition swallow the navigation.
     }
     if (!transitioned) go();
   };

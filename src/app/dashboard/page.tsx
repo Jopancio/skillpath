@@ -217,7 +217,7 @@ export default function DashboardPage() {
         animate="show"
         className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 md:py-10 lg:py-12"
       >
-        {/* ── Hero ─────────────────────────────────────────────── */}
+        {/* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.section
           variants={itemVariants}
           className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card"
@@ -300,7 +300,7 @@ export default function DashboardPage() {
                         </span>
                         {t.onboarding.summaryMinutes}
                         {goalDesc && (
-                          <span className="hidden sm:inline">· {goalDesc}</span>
+                          <span className="hidden sm:inline">Â· {goalDesc}</span>
                         )}
                       </Link>
                     )}
@@ -342,7 +342,7 @@ export default function DashboardPage() {
           </div>
         </motion.section>
 
-        {/* ── Spotlight: THE single next action ───────────────── */}
+        {/* â”€â”€ Spotlight: THE single next action â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         {(!hydrated || spotlight) && (
           <motion.section
             variants={itemVariants}
@@ -388,7 +388,7 @@ export default function DashboardPage() {
                     {spotlight.info.done}/{spotlight.info.lessonIds.length}{" "}
                     {t.common.lessons}
                     {spotlight.nextMinutes !== undefined && (
-                      <> · {spotlight.nextMinutes} {t.common.minutes}</>
+                      <> Â· {spotlight.nextMinutes} {t.common.minutes}</>
                     )}
                   </p>
                 </div>
@@ -417,7 +417,7 @@ export default function DashboardPage() {
           </motion.section>
         )}
 
-        {/* ── Stats ────────────────────────────────────────────── */}
+        {/* â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="mt-6 grid grid-cols-2 gap-3 sm:mt-8 sm:gap-4 md:grid-cols-4">
           <StatCard
             iconName="Zap"
@@ -449,7 +449,7 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* ── Main grid: courses → badges rail → leaderboard ──── */}
+        {/* â”€â”€ Main grid: courses â†’ badges rail â†’ leaderboard â”€â”€â”€â”€ */}
         <div className="mt-8 grid gap-8 sm:mt-10 lg:grid-cols-3 lg:gap-10">
           {/* My courses */}
           <motion.section
@@ -667,7 +667,7 @@ export default function DashboardPage() {
   );
 }
 
-/* ── Pieces ────────────────────────────────────────────────── */
+/* â”€â”€ Pieces â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 function LevelRing({
   percent,
@@ -717,8 +717,8 @@ function LevelRing({
             x2="1"
             y2="1"
           >
-            <stop offset="0%" stopColor="#FF6B2C" />
-            <stop offset="100%" stopColor="#F4B942" />
+            <stop offset="0%" stopColor="#2563EB" />
+            <stop offset="100%" stopColor="#38BDF8" />
           </linearGradient>
         </defs>
       </svg>
@@ -874,7 +874,7 @@ function CourseRow({
               )}
             </h3>
             <p className="mt-0.5 text-xs font-semibold tabular-nums text-muted">
-              {info.done}/{stats.lessons} {t.common.lessons} · {info.pct}%
+              {info.done}/{stats.lessons} {t.common.lessons} Â· {info.pct}%
             </p>
           </div>
         </div>

@@ -5,15 +5,15 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /* ============================================================ */
-/*  PageTransition — branded page-to-page transition             */
+/*  PageTransition â€” branded page-to-page transition             */
 /*                                                               */
 /*  Sequence on pathname changes outside the main app pages:     */
-/*    1. "out"    — the whole page fades away behind a veil of   */
+/*    1. "out"    â€” the whole page fades away behind a veil of   */
 /*                  the app background (chrome included).        */
-/*    2. "text"   — "SkillPath" fades in, holds, fades out; the  */
+/*    2. "text"   â€” "SkillPath" fades in, holds, fades out; the  */
 /*                  incoming page is swapped in unseen behind    */
 /*                  the opaque veil.                             */
-/*    3. "reveal" — the veil lifts while the new page fades and  */
+/*    3. "reveal" â€” the veil lifts while the new page fades and  */
 /*                  rises into place.                            */
 /*  Navigating mid-sequence retargets it to the newest route.    */
 /*  Honors prefers-reduced-motion by swapping instantly.         */
@@ -42,7 +42,7 @@ export function PageTransition({ children }: { children: React.ReactNode }) {
     children: React.ReactNode;
   } | null>(null);
 
-  // Detect navigation render-time (no effect) and kick off — or retarget —
+  // Detect navigation render-time (no effect) and kick off â€” or retarget â€”
   // the sequence.
   const [prevPathname, setPrevPathname] = useState(pathname);
   if (prevPathname !== pathname) {

@@ -664,7 +664,7 @@ export const contentCreator: Course = {
           { id: "1 menit", en: "1 minute" },
         ],
         correctIndex: 1,
-        explanation: { id: "Penonton memutuskan lanjut atau scroll dalam 3 detik pertama — hook harus langsung menggigit.", en: "Viewers decide to keep watching or scroll within the first 3 seconds — the hook must bite instantly." },
+        explanation: { id: "Penonton memutuskan lanjut atau scroll dalam 3 detik pertama â€” hook harus langsung menggigit.", en: "Viewers decide to keep watching or scroll within the first 3 seconds â€” the hook must bite instantly." },
       },
       {
         id: "contentCreator-m10-cq2",
@@ -691,8 +691,8 @@ export const contentCreator: Course = {
         duration: 6,
         xp: 30,
         body: {
-          id: "Proyek pamungkas: terbitkan **3 konten dalam 7 hari** dari niche yang sama.\n\n**Aturan main:**\n1. Semua konten memakai struktur hook-isi-CTA\n2. Satu format berbeda di tiap konten (tutorial, storytelling, listicle)\n3. Catat metrik tiap konten 48 jam setelah terbit: views, retention, engagement\n\nDari proyek ini kamu akan tahu format mana yang paling cocok dengan audiensmu — bukan tebakan lagi.\n\n## Latihan Praktis\nJalankan proyeknya, lalu tulis evaluasi singkat: format mana yang menang dan kenapa. Jadikan itu acuan content calendar-mu berikutnya.",
-          en: "The ultimate project: publish **3 pieces of content in 7 days** from the same niche.\n\n**Rules:**\n1. All content uses the hook-body-CTA structure\n2. A different format for each piece (tutorial, storytelling, listicle)\n3. Record each piece's metrics 48 hours after publishing: views, retention, engagement\n\nFrom this project you'll know which format fits your audience best — no more guessing.\n\n## Practical Exercise\nRun the project, then write a short evaluation: which format won and why. Use it as the basis for your next content calendar.",
+          id: "Proyek pamungkas: terbitkan **3 konten dalam 7 hari** dari niche yang sama.\n\n**Aturan main:**\n1. Semua konten memakai struktur hook-isi-CTA\n2. Satu format berbeda di tiap konten (tutorial, storytelling, listicle)\n3. Catat metrik tiap konten 48 jam setelah terbit: views, retention, engagement\n\nDari proyek ini kamu akan tahu format mana yang paling cocok dengan audiensmu â€” bukan tebakan lagi.\n\n## Latihan Praktis\nJalankan proyeknya, lalu tulis evaluasi singkat: format mana yang menang dan kenapa. Jadikan itu acuan content calendar-mu berikutnya.",
+          en: "The ultimate project: publish **3 pieces of content in 7 days** from the same niche.\n\n**Rules:**\n1. All content uses the hook-body-CTA structure\n2. A different format for each piece (tutorial, storytelling, listicle)\n3. Record each piece's metrics 48 hours after publishing: views, retention, engagement\n\nFrom this project you'll know which format fits your audience best â€” no more guessing.\n\n## Practical Exercise\nRun the project, then write a short evaluation: which format won and why. Use it as the basis for your next content calendar.",
         },
         },
         {

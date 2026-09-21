@@ -164,7 +164,7 @@ function passwordStrength(pw: string): {
 const INPUT_CLASS =
   "w-full rounded-xl border-2 border-border bg-background px-4 py-3 text-base font-semibold outline-none transition-all duration-200 placeholder:font-normal placeholder:text-muted focus:-translate-y-px focus:border-primary focus:shadow-[0_0_0_4px_rgb(255_107_44/0.12)] sm:text-sm";
 
-/** Labeled input shell — icon warms up when the field gains focus. */
+/** Labeled input shell â€” icon warms up when the field gains focus. */
 function Field({
   label,
   icon: Icon,
@@ -514,7 +514,7 @@ export default function LoginPage() {
             </motion.span>
           </motion.div>
 
-          {/* Headline — words flip in one by one */}
+          {/* Headline â€” words flip in one by one */}
           <motion.h1
             className="font-display text-4xl font-extrabold leading-[1.12] tracking-tight xl:text-5xl"
             style={{ perspective: 900 }}
@@ -553,7 +553,7 @@ export default function LoginPage() {
               typingSpeed={70}
               deletingSpeed={38}
               pauseDuration={1700}
-              cursorCharacter="▍"
+              cursorCharacter="â–"
               cursorClassName="text-primary"
             />
           </motion.div>
@@ -640,7 +640,7 @@ export default function LoginPage() {
                   </span>
                 </motion.div>
 
-                {/* Segmented mode switcher — kept mounted across mode
+                {/* Segmented mode switcher â€” kept mounted across mode
                     switches so the active pill slides between tabs; it
                     collapses while the verify step is open. */}
                 <AnimatePresence initial={false}>
@@ -849,7 +849,7 @@ export default function LoginPage() {
                       >
                         {mode === "login"
                           ? "Masuk untuk melanjutkan perjalananmu"
-                          : "Gratis — mulai belajar dalam 1 menit"}
+                          : "Gratis â€” mulai belajar dalam 1 menit"}
                       </motion.p>
 
                       <motion.form
@@ -962,7 +962,7 @@ export default function LoginPage() {
                                     {strength.label}
                                     {password.length < 15 && (
                                       <span className="ml-1 font-semibold text-muted">
-                                        · {password.length}/15
+                                        Â· {password.length}/15
                                       </span>
                                     )}
                                   </span>
@@ -1012,7 +1012,7 @@ export default function LoginPage() {
                           <span className="h-px flex-1 bg-border" />
                         </div>
 
-                        {/* Google button — below the submit button */}
+                        {/* Google button â€” below the submit button */}
                         <button
                           type="button"
                           onClick={handleGoogle}

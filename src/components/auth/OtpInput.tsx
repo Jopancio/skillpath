@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 const LENGTH = 6;
 
 /* ============================================================ */
-/*  OtpInput — 6-box verification code input                     */
+/*  OtpInput â€” 6-box verification code input                     */
 /*                                                               */
 /*  Auto-advances on type, supports paste, backspace walks       */
 /*  backwards, and fires onComplete once the last box is         */

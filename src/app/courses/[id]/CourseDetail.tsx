@@ -164,7 +164,7 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                 <div className="mb-1 flex items-center justify-between text-xs font-bold">
                   <span className="text-muted">{t.courses.progress}</span>
                   <span className="text-primary">
-                    {done}/{allLessonIds.length} · {percent}%
+                    {done}/{allLessonIds.length} Â· {percent}%
                   </span>
                 </div>
                 <ProgressBar percent={percent} />
@@ -257,7 +257,7 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                       {pick(locale, mod.title)}
                     </h3>
                     <p className="text-xs font-semibold text-muted">
-                      {mod.lessons.length} {t.common.lessons} ·{" "}
+                      {mod.lessons.length} {t.common.lessons} Â·{" "}
                       {unlocked
                         ? `${modDone}/${mod.lessons.length}`
                         : t.courses.unlockHint}
@@ -306,7 +306,7 @@ export function CourseDetail({ course: initial }: { course: Course }) {
                           {pick(locale, lesson.title)}
                         </span>
                         <span className="block text-xs font-semibold text-muted">
-                          {lesson.duration} {t.common.minutes} · {lesson.xp} XP
+                          {lesson.duration} {t.common.minutes} Â· {lesson.xp} XP
                         </span>
                       </span>
                       {lessonUnlocked && (

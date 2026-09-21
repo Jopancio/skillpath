@@ -76,11 +76,11 @@ interface SortGame extends BaseGame {
 type Game = SwipeGame | TapGame | MatchGame | FlipGame | SortGame;
 
 /* ============================================================ */
-/*  Game data — 5 mini-games, variety of interactions           */
+/*  Game data â€” 5 mini-games, variety of interactions           */
 /* ============================================================ */
 
 const GAMES: Game[] = [
-  // 1. SWIPE — Swipe right for true, left for false
+  // 1. SWIPE â€” Swipe right for true, left for false
   {
     id: "g1",
     type: "swipe",
@@ -91,7 +91,7 @@ const GAMES: Game[] = [
     statement: "Belajar 25 menit setiap hari lebih efektif daripada 5 jam seminggu sekali",
     isTrue: true,
   },
-  // 2. TAP — Tap the correct answer fast
+  // 2. TAP â€” Tap the correct answer fast
   {
     id: "g2",
     type: "tap",
@@ -106,7 +106,7 @@ const GAMES: Game[] = [
       { text: "Menyimak sambil tidur", correct: false },
     ],
   },
-  // 3. MATCH — Match pairs by tapping
+  // 3. MATCH â€” Match pairs by tapping
   {
     id: "g3",
     type: "match",
@@ -120,7 +120,7 @@ const GAMES: Game[] = [
       { id: "p3", left: "Pomodoro", right: "25 menit fokus, 5 menit istirahat" },
     ],
   },
-  // 4. FLIP — Flip card to reveal, then decide true/false
+  // 4. FLIP â€” Flip card to reveal, then decide true/false
   {
     id: "g4",
     type: "flip",
@@ -131,7 +131,7 @@ const GAMES: Game[] = [
     statement: "Mengajar ulang materi ke orang lain memperkuat pemahamanmu sendiri",
     isTrue: true,
   },
-  // 5. SORT — Drag items into correct order
+  // 5. SORT â€” Drag items into correct order
   {
     id: "g5",
     type: "sort",
@@ -340,7 +340,7 @@ function GameIntro({ game }: { game: Game }) {
 }
 
 /* ============================================================ */
-/*  Game play — dispatch to correct game type                    */
+/*  Game play â€” dispatch to correct game type                    */
 /* ============================================================ */
 
 function GamePlay({
@@ -367,7 +367,7 @@ function GamePlay({
 }
 
 /* ============================================================ */
-/*  Game 1: SWIPE — drag left (false) / right (true)             */
+/*  Game 1: SWIPE â€” drag left (false) / right (true)             */
 /* ============================================================ */
 
 function SwipePlay({
@@ -493,7 +493,7 @@ function SwipePlay({
               ? "Demo otomatis..."
               : dragging
                 ? "Lepaskan untuk jawab!"
-                : "Geser kartu →"}
+                : "Geser kartu â†’"}
           </p>
         </motion.div>
       </div>
@@ -502,7 +502,7 @@ function SwipePlay({
 }
 
 /* ============================================================ */
-/*  Game 2: TAP — tap correct answer quickly                    */
+/*  Game 2: TAP â€” tap correct answer quickly                    */
 /* ============================================================ */
 
 function TapPlay({
@@ -650,7 +650,7 @@ function TapPlay({
 }
 
 /* ============================================================ */
-/*  Game 3: MATCH — tap left then right to match pairs           */
+/*  Game 3: MATCH â€” tap left then right to match pairs           */
 /* ============================================================ */
 
 function MatchPlay({
@@ -799,7 +799,7 @@ function MatchPlay({
       </div>
 
       <p className="mb-3 text-sm font-semibold text-muted">
-        {autoPlay ? "Demo otomatis..." : "Kiri: istilah → Kanan: arti"}
+        {autoPlay ? "Demo otomatis..." : "Kiri: istilah â†’ Kanan: arti"}
       </p>
 
       <div className="grid flex-1 grid-cols-2 gap-3">
@@ -870,7 +870,7 @@ function MatchPlay({
 }
 
 /* ============================================================ */
-/*  Game 4: FLIP — flip card to reveal, then true/false          */
+/*  Game 4: FLIP â€” flip card to reveal, then true/false          */
 /* ============================================================ */
 
 function FlipPlay({
@@ -1034,7 +1034,7 @@ function FlipPlay({
 }
 
 /* ============================================================ */
-/*  Game 5: SORT — tap items in correct order                    */
+/*  Game 5: SORT â€” tap items in correct order                    */
 /* ============================================================ */
 
 function SortPlay({
@@ -1288,7 +1288,7 @@ function GameResult({
       </h3>
       <p className="mt-2 text-sm font-semibold text-muted">
         {isCorrect
-          ? "+1 poin — kamu pintar!"
+          ? "+1 poin â€” kamu pintar!"
           : "Tetap semangat, coba game berikutnya!"}
       </p>
 

@@ -20,12 +20,12 @@ export interface LeaderboardEntry {
 
 /** Palette matching the old dummy board so the look stays familiar. */
 const AVATAR_COLORS = [
-  "#FF6B2C",
+  "#2563EB",
   "#3B82F6",
   "#EC4899",
-  "#F4B942",
+  "#38BDF8",
   "#8B5CF6",
-  "#D94A16",
+  "#1D4ED8",
   "#22C55E",
 ];
 

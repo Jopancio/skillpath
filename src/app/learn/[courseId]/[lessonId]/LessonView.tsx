@@ -48,7 +48,7 @@ function AILessonView({
   }
 
   const course = getCourseById(courseId);
-  // findLesson works on a Course object directly — getLesson() would only
+  // findLesson works on a Course object directly â€” getLesson() would only
   // search builtin courses, which is why AI lessons 404'd.
   const found = course ? findLesson(course, lessonId) : undefined;
   if (!course || !found) notFound();
@@ -94,7 +94,7 @@ function LessonContent({
       particleCount: 90,
       spread: 70,
       origin: { y: 0.7 },
-      colors: ["#FF6B2C", "#F4B942", "#D94A16", "#FFA726"],
+      colors: ["#2563EB", "#38BDF8", "#1D4ED8", "#60A5FA"],
     });
     setTimeout(() => setXpPop(false), 1200);
   }
@@ -137,7 +137,7 @@ function LessonContent({
           {t.lesson.backToPath}
         </Link>
         <span className="text-xs font-bold text-muted">
-          {pick(locale, course.title)} · {currentIdx + 1}/{ids.length}
+          {pick(locale, course.title)} Â· {currentIdx + 1}/{ids.length}
         </span>
       </div>
 
@@ -265,7 +265,7 @@ function LessonContent({
 
       {allDone && isDone && !next && (
         <p className="mt-4 text-center text-sm font-semibold text-muted">
-          {t.certificate.title} → {t.courses.quiz}
+          {t.certificate.title} â†’ {t.courses.quiz}
         </p>
       )}
     </div>

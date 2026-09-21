@@ -337,7 +337,7 @@ function NotesTool({
       const data = await callAssistant({
         action: "notes",
         course: {
-          title: `${pick(locale, course.title)} — ${mod.title}`,
+          title: `${pick(locale, course.title)} â€” ${mod.title}`,
           description: pick(locale, course.longDescription),
           modules: [
             { title: mod.title, lessons: mod.lessons.map((l) => l.title) },
@@ -453,7 +453,7 @@ function NotesTool({
                           </span>
                           <span className="flex-1">{lesson.title}</span>
                           <span className="shrink-0 text-[10px] text-muted/70">
-                            {lesson.duration} {t.common.minutes} · {lesson.xp} XP
+                            {lesson.duration} {t.common.minutes} Â· {lesson.xp} XP
                           </span>
                           <ChevronRight className="h-3.5 w-3.5 shrink-0 text-muted/50" />
                         </button>
@@ -617,7 +617,7 @@ function LessonNoteDialog({
       const data = await callAssistant({
         action: "notes",
         course: {
-          title: `${pick(locale, course.title)} — ${lesson.title}`,
+          title: `${pick(locale, course.title)} â€” ${lesson.title}`,
           description: pick(locale, course.longDescription),
           modules: [{ title: lesson.moduleTitle, lessons: [lesson.title] }],
         },
@@ -854,7 +854,7 @@ function FlashcardsTool({ course }: { course: Course }) {
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
           <Sparkles className="h-3.5 w-3.5" />
-          {t.studyTools.generatedByAi} · {cards.length}
+          {t.studyTools.generatedByAi} Â· {cards.length}
         </span>
         <button
           type="button"
@@ -894,7 +894,7 @@ function FlashcardsTool({ course }: { course: Course }) {
               </span>
               <span className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted">
                 <RefreshCw className="h-3 w-3" />
-                {t.studyTools.flashcardFlip} · {index + 1}/{cards.length}
+                {t.studyTools.flashcardFlip} Â· {index + 1}/{cards.length}
               </span>
             </div>
 
@@ -908,7 +908,7 @@ function FlashcardsTool({ course }: { course: Course }) {
               </span>
               <span className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-muted">
                 <RefreshCw className="h-3 w-3" />
-                {t.studyTools.flashcardFlip} · {index + 1}/{cards.length}
+                {t.studyTools.flashcardFlip} Â· {index + 1}/{cards.length}
               </span>
             </div>
           </motion.div>
@@ -1658,7 +1658,7 @@ function QuizTool({ course }: { course: Course }) {
         <div>
           <div className="font-display text-3xl font-extrabold">{percent}%</div>
           <div className="mt-1 text-sm font-semibold text-muted">
-            {t.studyTools.quizScore} · {correct}/{questions.length} {t.studyTools.quizCorrect}
+            {t.studyTools.quizScore} Â· {correct}/{questions.length} {t.studyTools.quizCorrect}
           </div>
         </div>
         <div className="flex flex-wrap justify-center gap-2.5">

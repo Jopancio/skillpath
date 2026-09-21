@@ -78,8 +78,8 @@ export function firstLessonOfModule(course: Course, moduleIndex: number) {
 
 /**
  * Is a module unlocked? Module 0 always is. Every previous module must be
- * fully cleared: all of its lessons done AND — when it has an end-of-chapter
- * quiz — that quiz passed. Material -> chapter quiz -> next material.
+ * fully cleared: all of its lessons done AND â€” when it has an end-of-chapter
+ * quiz â€” that quiz passed. Material -> chapter quiz -> next material.
  */
 export function isModuleUnlocked(
   course: Course,
@@ -102,7 +102,7 @@ export function isModuleUnlocked(
 
 /**
  * Effective per-lesson unlock within a phase: the phase's 3 material slides
- * open one by one in order — slide 2 needs slide 1 done, slide 3 needs
+ * open one by one in order â€” slide 2 needs slide 1 done, slide 3 needs
  * slides 1+2 done. The phase quiz then opens once all 3 slides are done.
  */
 export function isLessonUnlocked(

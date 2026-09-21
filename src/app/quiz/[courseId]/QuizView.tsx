@@ -143,7 +143,7 @@ function QuizContent({
         particleCount: 160,
         spread: 100,
         origin: { y: 0.6 },
-        colors: ["#FF6B2C", "#F4B942", "#D94A16", "#FFA726", "#FFD54F"],
+        colors: ["#2563EB", "#38BDF8", "#1D4ED8", "#60A5FA", "#BAE6FD"],
       });
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -228,7 +228,7 @@ function QuizContent({
               </h1>
               <p className="text-xs font-semibold text-muted">
                 {isModuleQuiz && mod
-                  ? `${pick(locale, mod.title)} · ${t.quiz.moduleSubtitle}`
+                  ? `${pick(locale, mod.title)} Â· ${t.quiz.moduleSubtitle}`
                   : t.quiz.subtitle}
               </p>
             </div>
@@ -283,7 +283,7 @@ function QuizContent({
 
           {quizMode === "formal" ? (
             <>
-              {/* Questions — formal mode */}
+              {/* Questions â€” formal mode */}
               <div className="mt-6 space-y-6">
                 {quizList.map((q, qi) => (
                   <motion.div
@@ -384,7 +384,7 @@ function QuizContent({
                     particleCount: 160,
                     spread: 100,
                     origin: { y: 0.6 },
-                    colors: ["#FF6B2C", "#F4B942", "#D94A16", "#FFA726", "#FFD54F"],
+                    colors: ["#2563EB", "#38BDF8", "#1D4ED8", "#60A5FA", "#BAE6FD"],
                   });
                 }
                 window.scrollTo({ top: 0, behavior: "smooth" });
@@ -414,7 +414,7 @@ function QuizContent({
 }
 
 /* ================================================================ */
-/*  Game Quiz — converts quiz questions into interactive mini-games */
+/*  Game Quiz â€” converts quiz questions into interactive mini-games */
 /* ================================================================ */
 
 type GameKind = "swipe" | "tap" | "match";
@@ -441,7 +441,7 @@ function GameQuizPlay({
   const [phase, setPhase] = useState<"intro" | "playing" | "feedback">("intro");
   const [lastCorrect, setLastCorrect] = useState<boolean | null>(null);
 
-  // Build game rounds from quiz questions — cycle through game types
+  // Build game rounds from quiz questions â€” cycle through game types
   const rounds = useMemo<GameRound[]>(() => {
     const kinds: GameKind[] = ["tap", "swipe", "match"];
     return questions.map((q, i) => ({
@@ -1097,7 +1097,7 @@ function ResultView({
                       )}
                     >
                       {pick(locale, opt)}
-                      {oi === correct && ` · ${t.quiz.correctAnswer}`}
+                      {oi === correct && ` Â· ${t.quiz.correctAnswer}`}
                     </p>
                   ))}
                 </div>

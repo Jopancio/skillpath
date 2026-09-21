@@ -102,9 +102,9 @@ export default function MindMapDemoPage() {
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,var(--color-border)_1px,transparent_1px)] [background-size:24px_24px] opacity-60" />
       <div className="absolute left-4 top-4 z-10 rounded-xl border border-border bg-card px-4 py-2 shadow-sm">
         <p className="font-display text-sm font-semibold text-foreground">
-          Peta Pikiran — Fitur Aplikasi
+          Peta Pikiran â€” Fitur Aplikasi
         </p>
-        <p className="text-[11px] text-muted">Geser untuk jelajah • Scroll untuk zoom</p>
+        <p className="text-[11px] text-muted">Geser untuk jelajah â€¢ Scroll untuk zoom</p>
       </div>
       <MindMap data={demoData} />
     </main>

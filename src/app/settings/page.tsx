@@ -54,7 +54,7 @@ export default function SettingsPage() {
         animate="show"
         className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-8 md:py-10 lg:py-12"
       >
-        {/* ── Header ────────────────────────────────────────────── */}
+        {/* â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <motion.header variants={itemVariants}>
           <p className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-muted">
             {t.nav.settings}
@@ -67,7 +67,7 @@ export default function SettingsPage() {
           </p>
         </motion.header>
 
-        {/* ── Appearance & language ─────────────────────────────── */}
+        {/* â”€â”€ Appearance & language â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
         <div className="mt-6 space-y-4 lg:mt-8">
           <Card>
             <h2 className="font-display text-lg font-extrabold tracking-tight">
@@ -146,7 +146,7 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          {/* ── Daily goal ──────────────────────────────────────── */}
+          {/* â”€â”€ Daily goal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <Card>
             <h2 className="font-display text-lg font-extrabold tracking-tight">
               {t.settings.dailyGoalTitle}
@@ -202,7 +202,7 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          {/* ── Danger zone ─────────────────────────────────────── */}
+          {/* â”€â”€ Danger zone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
           <motion.section
             variants={itemVariants}
             className="rounded-3xl border border-error/40 bg-error/[0.04] p-5 sm:p-7"

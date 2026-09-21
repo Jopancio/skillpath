@@ -13,6 +13,7 @@ import {
 } from "framer-motion";
 import {
   ArrowRight,
+  BriefcaseBusiness,
   ChevronRight,
   CircleUserRound,
   Flame,
@@ -41,7 +42,7 @@ import { ThemeToggle } from "./ThemeToggle";
 /* Shared animation presets */
 const SPRING = { type: "spring", stiffness: 320, damping: 30 } as const;
 
-/** Glide of the active pill between nav items — snappy but weighty, with a
+/** Glide of the active pill between nav items â€” snappy but weighty, with a
  *  hint of overshoot so the pill feels like it "lands" on the new section. */
 const PILL_TRANSITION: Transition = {
   layout: { type: "spring", stiffness: 420, damping: 32, mass: 0.9 },
@@ -129,6 +130,7 @@ export function Navbar() {
           ]
         : [
             { href: "/courses", label: t.nav.courses, icon: Map, anchor: false },
+            { href: "/simulations", label: "Simulasi Kerja", icon: BriefcaseBusiness, anchor: false },
             { href: "/dashboard", label: t.nav.dashboard, icon: LayoutDashboard, anchor: false },
           ],
     [isLanding, t]
@@ -248,7 +250,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop nav — floating segmented dock (landing page only;
+          {/* Desktop nav â€” floating segmented dock (landing page only;
               app pages navigate via the hamburger drawer + sidebar) */}
           <nav
             className={cn(
@@ -339,8 +341,8 @@ export function Navbar() {
             </div>
           )}
 
-          {/* Hamburger actions — mobile on the landing page, every
-              viewport on app pages (dashboard, courses, …) */}
+          {/* Hamburger actions â€” mobile on the landing page, every
+              viewport on app pages (dashboard, courses, â€¦) */}
           <div
             className={cn(
               "items-center gap-2",

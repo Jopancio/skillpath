@@ -21,14 +21,14 @@ export const badges: Badge[] = [
     name: { id: "Streak 3 Hari", en: "3-Day Streak" },
     description: { id: "Belajar 3 hari berturut-turut", en: "Learn 3 days in a row" },
     icon: "Flame",
-    color: "#FF6B2C",
+    color: "#2563EB",
   },
   {
     id: "streak-7",
     name: { id: "Streak 7 Hari", en: "7-Day Streak" },
     description: { id: "Belajar seminggu penuh tanpa putus", en: "Learn a full week without missing" },
     icon: "Zap",
-    color: "#F4B942",
+    color: "#38BDF8",
   },
   {
     id: "bookworm",
@@ -56,7 +56,7 @@ export const badges: Badge[] = [
     name: { id: "Penakluk Kursus", en: "Course Conqueror" },
     description: { id: "Selesaikan semua pelajaran di satu kursus", en: "Complete all lessons in one course" },
     icon: "Trophy",
-    color: "#D94A16",
+    color: "#1D4ED8",
   },
   {
     id: "certified",
@@ -77,7 +77,7 @@ export const badges: Badge[] = [
     name: { id: "Legenda 1000 XP", en: "1000 XP Legend" },
     description: { id: "Kumpulkan total 1000 XP", en: "Collect 1000 total XP" },
     icon: "Crown",
-    color: "#FF6B2C",
+    color: "#2563EB",
   },
 ];
 
